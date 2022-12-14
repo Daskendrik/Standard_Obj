@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function createList() {
+            let contents = ""
+            let  p = document.getElementById('mainA').innerHTML
+            div = document.createElement('textarea');
+            let list = p.split(',')
+            for (let i = 0; i < list.length; i++) {
+                let element = list[i];
+                contents += "<option value='" + element + "'>"
+            }
+            div.innerHTML = contents
+            console.log(div)
+            document.body.append(div);
+        }
+    </script>
+</head>
+
+<body>
+    <button type="button" onclick="createList()">Кнопка</button>
+    <p id = 'mainA'>ADM Comm Package,ATC ADM Data Validation Message,ATC ADM EAI Lookup Map,ATC EFS ADM,ATC EFS Manage Profile ADM3,ATC Log Configuration,ATC System Preferences,Audit Trail Admin,DataMapObject,DV,EAI Data Map,LOV,LOV Constant,PDQ,Personalization – Actions,Personalization – Applets,Personalization – Events,Personalization – Rules,Personalization – Views,Responsibility,View,Web Service - Inbound,Workflow Action Type,Workflow Policy,Конфигурация телефонии,Смарт скрипты,Link,Business Component,Workflow Process,Integration Object,Applet,Business Object,Screen,Pick List,Symbolic String,Web Template,Business Service,Icon Map,View,Bitmap Category,Task,Table,JS,CSS,HTML,PNG,srvmgr,sql</p>
+    <br>
+</body>
+</html>

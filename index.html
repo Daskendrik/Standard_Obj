@@ -1,89 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/Standard_Obj/style.css">
-    <!-- Только CSS Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <title>Регламент именования объектов в Jira</title>
-    <script>
-        // function getDateObj(name, pass) {
-        //     let url = 'https://kb-liga.phoenixit.ru/pages/viewpage.action?pageId=177817749'
-        //     let openWin = window.open('https://kb-liga.phoenixit.ru/pages/viewpage.action?pageId=177817749')
-        //     openWin.onload = function(){
-        //       console.log(openWin.document)
-        //     }
-        //     // let elem = openWin.document.getElementsByTagName('td')
-        //     alert(openWin.location.href);
-        //     console.log(openWin.document)
-        //     // openWin.close()
-            
-        // }
-        function addRow(tableID){
-            let objectTable= document.getElementById(tableID);
-            let newRow = objectTable.insertRow(-1)
-            let td1 = newRow.insertCell(0);
-            let td2 = newRow.insertCell(1);
-            let td3 = newRow.insertCell(2);
-            td1.innerHTML = `<input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
-                    <datalist id="datalistOptions">
-                        <option value="Personalization – Applets ">
-                        <option value="Personalization – Rules ">
-                        <option value="Personalization – Views ">
-                        <option value="Personalization – Events ">
-                        <option value="Personalization – Actions ">
-                        <option value="ATC ADM Data Validation Message  ">
-                        <option value="ATC ADM EAI Lookup Map  ">
-                    </datalist>`
-            td2.innerHTML = `<textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;">`
-            td3.innerHTML = `<button type="button" class="btn btn-primary">Удалить строку</button>`
-          }
-          function createList() {
-            let  div = document.querySelector('div')
-            console.log(div)
-            if(div) {div.remove()};
-            div = document.createElement('div');
-            let result = "";
-            let listOftd = null;
-            let sNameOb = null;
-            let sName = null;
-            let liFirst = document.createElement('li');
-            let listOftr = Array.from(document.querySelectorAll('tr'))
-            listOftr = listOftr.slice(1)
-            
-            for (let i = 0; i < listOftr.length; i++) {
-              let element = listOftr[i];
-              listOftd = Array.from(element.querySelectorAll('td'))
-              sNameOb = listOftd[0].querySelectorAll('input')[0].value
-              div.innerHTML = "<b>" + sNameOb + "</b>"
-              sName = listOftd[1].querySelectorAll('textarea')[0].value
-              sName = sName.split(',')
-              for (let j = 0; j < sName.length; j++) {
-                const element = sName[j];
-                div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
-              }
-            }
-            document.body.append(div);
-          }
-    </script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <!-- Только CSS Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <title>Регламент именования объектов в Jira</title>
+  <script>
+    function addRow(tableID){
+        let objectTable= document.getElementById(tableID);
+        let newRow = objectTable.insertRow(-1)
+        let td1 = newRow.insertCell(0);
+        let td2 = newRow.insertCell(1);
+        let td3 = newRow.insertCell(2);
+        td1.innerHTML = `<input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
+                <datalist id="datalistOptions">
+                  <option value='ADM Comm Package'><option value='ATC ADM Data Validation Message'><option value='ATC ADM EAI Lookup Map'><option value='ATC EFS ADM'><option value='ATC EFS Manage Profile ADM3'><option value='ATC Log Configuration'><option value='ATC System Preferences'><option value='Audit Trail Admin'><option value='DataMapObject'><option value='DV'><option value='EAI Data Map'><option value='LOV'><option value='LOV Constant'><option value='PDQ'><option value='Personalization – Actions'><option value='Personalization – Applets'><option value='Personalization – Events'><option value='Personalization – Rules'><option value='Personalization – Views'><option value='Responsibility'><option value='View'><option value='Web Service - Inbound'><option value='Workflow Action Type'><option value='Workflow Policy'><option value='Конфигурация телефонии'><option value='Смарт скрипты'><option value='Link'><option value='Business Component'><option value='Workflow Process'><option value='Integration Object'><option value='Applet'><option value='Business Object'><option value='Screen'><option value='Pick List'><option value='Symbolic String'><option value='Web Template'><option value='Business Service'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='JS'><option value='CSS'><option value='HTML'><option value='PNG'><option value='srvmgr'><option value='sql'>
+                </datalist>`
+        td2.innerHTML = `<textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;">`
+        td3.innerHTML = `<button type="button" class="btn btn-dark">Удалить строку</button>`
+    }
+    function createList() {
+      let  div = document.querySelector('div')
+      console.log(div)
+      if(div) {div.remove()};
+      div = document.createElement('div');
+      let result = "";
+      let listOftd = null;
+      let sNameOb = null;
+      let sName = null;
+      let liFirst = document.createElement('li');
+      let listOftr = Array.from(document.querySelectorAll('tr'))
+      listOftr = listOftr.slice(1)
+      
+      for (let i = 0; i < listOftr.length; i++) {
+        let element = listOftr[i];
+        if (!element) {
+          break
+        }
+        listOftd = Array.from(element.querySelectorAll('td'))
+        sNameOb = listOftd[0].querySelectorAll('input')[0].value
+        div.innerHTML += "<b>" + sNameOb + "</b>"
+        sName = listOftd[1].querySelectorAll('textarea')[0].value
+        sName = sName.split(',')
+        for (let j = 0; j < sName.length; j++) {
+          const element = sName[j];
+          div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
+        }
+      }
+      document.body.append(div);
+    }
+  </script>
 </head>
 <body>
-    <!-- <section>//В разработке, проблема с доступностью
-        <h3>Получаем список объектов</h3>
-        <div class="row g-3">
-            <div class="col-2">
-              <input type="text" class="form-control" placeholder="Пользователь" aria-label="Пользователь">
-            </div>
-            <div class="col-2">
-              <input type="text" class="form-control" placeholder="Пароль" aria-label="Пароль">
-            </div>
-            <div class="col">
-                <button type="button" class="btn btn-primary" onclick="getDateObj()">Получить информацию</button>
-            </div>
-          </div>
-    </section> -->
     <form>
         <h3>Ввод объектов</h3>
         <table class="table">
@@ -98,13 +69,7 @@
                 <td>
                     <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
                     <datalist id="datalistOptions">
-                        <option value="Personalization – Applets ">
-                        <option value="Personalization – Rules ">
-                        <option value="Personalization – Views ">
-                        <option value="Personalization – Events ">
-                        <option value="Personalization – Actions ">
-                        <option value="ATC ADM Data Validation Message  ">
-                        <option value="ATC ADM EAI Lookup Map  ">
+                      <option value='ADM Comm Package'><option value='ATC ADM Data Validation Message'><option value='ATC ADM EAI Lookup Map'><option value='ATC EFS ADM'><option value='ATC EFS Manage Profile ADM3'><option value='ATC Log Configuration'><option value='ATC System Preferences'><option value='Audit Trail Admin'><option value='DataMapObject'><option value='DV'><option value='EAI Data Map'><option value='LOV'><option value='LOV Constant'><option value='PDQ'><option value='Personalization – Actions'><option value='Personalization – Applets'><option value='Personalization – Events'><option value='Personalization – Rules'><option value='Personalization – Views'><option value='Responsibility'><option value='View'><option value='Web Service - Inbound'><option value='Workflow Action Type'><option value='Workflow Policy'><option value='Конфигурация телефонии'><option value='Смарт скрипты'><option value='Link'><option value='Business Component'><option value='Workflow Process'><option value='Integration Object'><option value='Applet'><option value='Business Object'><option value='Screen'><option value='Pick List'><option value='Symbolic String'><option value='Web Template'><option value='Business Service'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='JS'><option value='CSS'><option value='HTML'><option value='PNG'><option value='srvmgr'><option value='sql'>
                     </datalist>
                 </td>
                 <td><textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;"></textarea></td>
