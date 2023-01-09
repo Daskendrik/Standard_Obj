@@ -17,7 +17,7 @@
         let td3 = newRow.insertCell(2);
         td1.innerHTML = `<input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
                 <datalist id="datalistOptions">
-                  <option value='ADM Comm Package'><option value='ATC ADM Data Validation Message'><option value='ATC ADM EAI Lookup Map'><option value='ATC EFS ADM'><option value='ATC EFS Manage Profile ADM3'><option value='ATC Log Configuration'><option value='ATC System Preferences'><option value='Audit Trail Admin'><option value='DataMapObject'><option value='DV'><option value='EAI Data Map'><option value='LOV'><option value='LOV Constant'><option value='PDQ'><option value='Personalization – Actions'><option value='Personalization – Applets'><option value='Personalization – Events'><option value='Personalization – Rules'><option value='Personalization – Views'><option value='Responsibility'><option value='View'><option value='Web Service - Inbound'><option value='Workflow Action Type'><option value='Workflow Policy'><option value='Конфигурация телефонии'><option value='Смарт скрипты'><option value='Link'><option value='Business Component'><option value='Workflow Process'><option value='Integration Object'><option value='Applet'><option value='Business Object'><option value='Screen'><option value='Pick List'><option value='Symbolic String'><option value='Web Template'><option value='Business Service'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='JS'><option value='CSS'><option value='HTML'><option value='PNG'><option value='srvmgr'><option value='sql'>
+                  <option value='Pers.Applets'><option value='Pers.Rules'><option value='Pers.Views'><option value='Pers.Events'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
                 </datalist>`
         td2.innerHTML = `<textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;">`
         td3.innerHTML = `<button id = '`+indexRow+`'type="button" class="btn btn-dark" onclick = deleteRowIndex(this.id)>Удалить строку</button>`
@@ -53,6 +53,35 @@
     function deleteRowIndex(index) {
       document.getElementById('tObj').deleteRow(index)
     }
+
+    function createListADM() {
+      let  div = document.querySelector('div')
+      console.log(div)
+      if(div) {div.remove()};
+      div = document.createElement('div');
+      let result = "";
+      let listOftd = null;
+      let sNameOb = null;
+      let sName = null;
+      let liFirst = document.createElement('li');
+      let listOftr = Array.from(document.querySelectorAll('tr'))
+      listOftr = listOftr.slice(1)
+      
+      for (let i = 0; i < listOftr.length; i++) {
+        let element = listOftr[i];
+        listOftd = Array.from(element.querySelectorAll('td'))
+        sNameOb = listOftd[0].querySelectorAll('input')[0].value
+        if (!sNameOb) continue;
+        div.innerHTML += "<b>" + sNameOb + "</b>"
+        sName = listOftd[1].querySelectorAll('textarea')[0].value
+        sName = sName.split(',')
+        for (let j = 0; j < sName.length; j++) {
+          const element = sName[j];
+          div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
+        }
+      }
+      document.body.append(div);
+    }
   </script>
   <style>
     body {
@@ -79,7 +108,7 @@
                 <td>
                     <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
                     <datalist id="datalistOptions">
-                      <option value='ADM Comm Package'><option value='ATC ADM Data Validation Message'><option value='ATC ADM EAI Lookup Map'><option value='ATC EFS ADM'><option value='ATC EFS Manage Profile ADM3'><option value='ATC Log Configuration'><option value='ATC System Preferences'><option value='Audit Trail Admin'><option value='DataMapObject'><option value='DV'><option value='EAI Data Map'><option value='LOV'><option value='LOV Constant'><option value='PDQ'><option value='Personalization – Actions'><option value='Personalization – Applets'><option value='Personalization – Events'><option value='Personalization – Rules'><option value='Personalization – Views'><option value='Responsibility'><option value='View'><option value='Web Service - Inbound'><option value='Workflow Action Type'><option value='Workflow Policy'><option value='Конфигурация телефонии'><option value='Смарт скрипты'><option value='Link'><option value='Business Component'><option value='Workflow Process'><option value='Integration Object'><option value='Applet'><option value='Business Object'><option value='Screen'><option value='Pick List'><option value='Symbolic String'><option value='Web Template'><option value='Business Service'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='JS'><option value='CSS'><option value='HTML'><option value='PNG'><option value='srvmgr'><option value='sql'>
+                      <option value='Pers.Applets'><option value='Pers.Rules'><option value='Pers.Views'><option value='Pers.Events'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
                     </datalist>
                 </td>
                 <td><textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;"></textarea></td>
@@ -87,8 +116,8 @@
               </tr>
             </tbody>
           </table>
-        <button type="button" class="btn btn-primary" onclick = "addRow('ObjectName')">Добавить еще объект</button> <p></p>
-        <button type="button" class="btn btn-primary" onclick="createList()">Сформировать список</button>
+        <button type="button" class="btn btn-primary" onclick = "addRow('ObjectName')">Добавить объект</button> <p></p>
+        <button type="button" class="btn btn-primary" onclick="createList()">Сформировать список для JIRA</button>
     </form>
     <br>
     <section>
