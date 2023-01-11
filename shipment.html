@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Только CSS Bootstrap -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Только CSS Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <title>Регламент именования объектов в Jira</title>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <title>Руководство по поставке</title>
   <script>
     function addRow(tableID){
         let objectTable= document.getElementById(tableID);
@@ -23,25 +22,35 @@
         td2.innerHTML = `<textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;">`
         td3.innerHTML = `<button id = '`+indexRow+`'type="button" class="btn btn-dark" onclick = deleteRowIndex(this.id)>Удалить строку</button>`
     }
-    function createList() {
+    function deleteRowIndex(index) {
+      document.getElementById('tObj').deleteRow(index)
+    }
+    function createListADM() {
       let  div = document.querySelector('div')
       console.log(div)
       if(div) {div.remove()};
       div = document.createElement('div');
+      let ol_out = document.createElement('ol');
+      let ol_in = document.createElement('ol');
       let result = "";
+      let out_inf = "Сборка поставки";
+      let in_inf = "Выгрузка поставки";
       let listOftd = null;
       let sNameOb = null;
       let sName = null;
       let liFirst = document.createElement('li');
       let listOftr = Array.from(document.querySelectorAll('tr'))
+      div_out.innerHTML += "<b>" + out_inf + "</b><br>"
+      div_in.innerHTML += ""
       listOftr = listOftr.slice(1)
+
       
       for (let i = 0; i < listOftr.length; i++) {
         let element = listOftr[i];
         listOftd = Array.from(element.querySelectorAll('td'))
         sNameOb = listOftd[0].querySelectorAll('input')[0].value
         if (!sNameOb) continue;
-        div.innerHTML += "<b> " + sNameOb + "</b>"
+        div.innerHTML += "<b>" + sNameOb + "</b>"
         sName = listOftd[1].querySelectorAll('textarea')[0].value
         sName = sName.split(',')
         for (let j = 0; j < sName.length; j++) {
@@ -49,28 +58,23 @@
           div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
         }
       }
+      ol_in_text.innerHTML += "<li>Выполнить Release.sql папки поставки /db/ в схеме SIEBEL.</li><li>Удалить файл diccache.dat в папке C:\ses\siebsrvr\BIN.</li><li>Перезапустить EAI компоненту на всех Siebel App.</li>"
+      ol_in.appendChild(ol_in_text)
+      div_in.appendChild(ol_in)
       document.body.append(div);
+      document.body.append(div_out);
+      document.body.append(div_in);
     }
-    function deleteRowIndex(index) {
-      document.getElementById('tObj').deleteRow(index)
-    }
-    function copytext(el) {
-      var $tmp = $("<textarea>");
-      $("body").append($tmp);
-      $tmp.val($(el).text()).select();
-      document.execCommand("copy");
-      $tmp.remove();
-    }    
-  </script>
-  <style>
-    body {
-      padding: 40px;
-      margin: 0;
-    }
-    td {
-      vertical-align: middle;
-    }
-  </style>
+    </script>
+    <style>
+        body {
+            padding: 40px;
+            margin: 0;
+        }
+        td {
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
     <form>
@@ -78,7 +82,7 @@
         <table class="table" id="tObj">
             <thead>
               <tr>
-                <th scope="col">Именование объекта</th>
+                <th scope="col">Именование объекта в JIRA</th>
                 <th scope="col">Название объекта</th>
               </tr>
             </thead>
@@ -96,12 +100,11 @@
             </tbody>
           </table>
         <button type="button" class="btn btn-primary" onclick = "addRow('ObjectName')">Добавить объект</button> <p></p>
-        <button type="button" class="btn btn-primary" onclick="createList()">Сформировать список для JIRA</button>
+        <button type="button" class="btn btn-primary" onclick="createListADM()">Сформировать список для JIRA</button>
     </form>
     <br>
     <section>
         <h3>Полученный результат</h3>
-        <button type="button" class="btn btn-primary" onclick="copytext('div')">Скопировать</button>
     </section>
 </body>
 </html>
