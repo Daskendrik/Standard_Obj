@@ -46,37 +46,111 @@
         let c = "" //загрузка на стенд
         let tableOb = "";
         let fildBase = ""
+        let fildRel = "X_RELEASE";
         sql = ""
         switch(obj) {
           case 'Pers.Applets':
             b =  "Pers.Applets. Индивидуальная настройка - апплет. Запрос " + listOr +"<br> update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + listSQL + ");<br> commit;"
-            sql += "--Pers.Applets<br> update siebel.S_CT_APPLET a set a.X_RELEASE = '" + ver + "' where APPLET_NAME in (" + listSQL + ");<br> commit;<br>"
+            tableOb = "S_CT_APPLET";
+            fildBase = "APPLET_NAME";
             break;
           case 'Pers.Rules':
             b =  "Pers.Rules. Перейти на страницу Индивидуальная настройка – набор правил. Поставить объектам: " + list + "  - версиию " + ver + " ."
-            sql += "--Pers.Rules<br> update siebel.S_CT_RULE_SET a set a.X_RELEASE = '" + ver + "' where NAME in (" + listSQL + ");<br> commit;<br>"
+            tableOb = "S_CT_RULE_SET";
+            fildBase = "NAME";
             break;
           case 'Pers.Views':
             b =  "FINS. Перейти на страницу Индивидуальная настройка - Представление. Поставить объектам: " + list + "  - версиию " + ver + " ."
-            sql += "--Pers.Views <br> update siebel.S_APP_VIEW a set a.X_RELEASE = '" + ver + "' where NAME in (" + listSQL + ");<br> commit;<br>"
+            tableOb = "S_APP_VIEW";
+            fildBase = "NAME";
             break;
           case 'RTE': //необходимо поменять в проге лист + нужна функция
             b =  "FINS. Перейти на страницу События обработки - События. Поставить объектам: " + list + "  - версиию " + ver + " ."
-            sql += "--RTE <br> update siebel.S_CT_EVENT a set a.X_RELEASE = '" + ver + "' where OBJ_NAME in (" + listSQL + ");<br> commit;<br>"
+            tableOb = "S_CT_EVENT";
+            fildBase = "OBJ_NAME";
             break;
           case 'Pers.Actions':
             b =  "FINS. Перейти на страницу События обработки - Наборы действий. Поставить объектам: " + list + "  - версиию " + ver + " ."
-            sql += "--Pers.Actions <br> update siebel.S_CT_ACTION_SET a set a.X_RELEASE = '" + ver + "' where NAME in (" + listSQL + ");<br> commit;<br>"
+            tableOb = "S_CT_ACTION_SET";
+            fildBase = "NAME";
             break;
           case 'DVM':
             b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
-            sql += "--DVM <br> update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in (" + listSQL + ");<br> commit;<br>"
+            tableOb = "S_ISS_VALDN_MSG";
+            fildBase = "MSG_TYPE_CD";
             break;
-          case 'DVM':
+          case 'EAI Lookup Map':
             b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
-            sql += "--DVM <br> update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in (" + listSQL + ");<br> commit;<br>"
+            tableOb = "S_EAI_LOOKUPMAP";
+            fildBase = "LOOKUP_TYPE";
+            break;
+          case 'EAI Data Map':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_INT_OBJMAP";
+            fildBase = "NAME";
+            break;
+          case 'Comm Pkg':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_DMND_CRTN_PRG";
+            fildBase = "NAME";
+            break;
+          case 'Inb.WS':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_WS_WEBSERVICE";
+            fildBase = "NAME";
+            break;
+          case 'Out.WS':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_WS_WEBSERVICE";
+            fildBase = "NAME";
+            break;
+          case 'DTU': //необходимо поменять в проге лист
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_BUSOBJ_DMAP";
+            fildBase = "NAME";
+            break;
+          case 'ATC Log Configuration':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "CX_LOG_CONFIG";
+            fildBase = "NAME";
+            break;
+          case 'Audit Trail':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_AUDIT_BUSCOMP";
+            fildBase = "BUSCOMP_NAME";
+            break;
+          case 'Wf Action Type':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_ACTION_DEFN";
+            fildBase = "ROW_ID"; //УТОЧНИТЬ!
+            break;
+          case 'Wf Policy':
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_ESCL_RULE";
+            fildBase = "NAME"; //УТОЧНИТЬ!
+            break;
+          case 'АДМ - представление': //УТОЧНИТЬ!
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_APP_VIEW";
+            fildBase = "NAME"; 
+            break;
+          case 'Responsibility': 
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_RESP";
+            fildBase = "NAME"; 
+            break;
+          case 'SysPref ': 
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_SYS_PREF";
+            fildBase = "SYS_PREF_CD"; 
+            break;
+          case 'PDQ': 
+            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            tableOb = "S_APP_QUERY";
+            fildBase = "SYS_PREF_CD"; 
             break;
         }
+        sql = "--" + obj + " <br> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where " + fildBase + " in (" + listSQL + ");<br> commit;<br>"
         ol.appendChild(li);
         li.innerHTML=li.innerHTML + b;
         return sql;
