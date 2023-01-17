@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+   ul#proList{list-style-position: inside}
+   li.item{list-style:none; padding:5px;}
+</style>
+</head>
+<body>
+    <div id="renderList"></div>
+</body>
+<script>
+    (function(){
+        var ol = document.createElement('ol');
+        ol.setAttribute('id','proList');
+
+        productList = ['Electronics Watch','House wear Items','Kids wear','Women Fashion'];
+
+        document.getElementById('renderList').appendChild(ol);
+        productList.forEach(renderProductList);
+
+        function renderProductList(element, index, arr) {
+            var li = document.createElement('li');
+
+            ol.appendChild(li);
+
+            li.innerHTML=li.innerHTML + element;
+        }
+    })();
+</script>
+</html>
