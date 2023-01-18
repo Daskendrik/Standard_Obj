@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Только CSS Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <title>Регламент именования объектов в Jira</title>
+  <title>Сборка и выгрузка патча</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
     function addRow(tableID){
@@ -38,125 +38,174 @@
       let sNameOb = null;
       let sName = null;
 
-      function createListOfOut (obj, list, ver, sql){ 
+      function createListOfNoRepOut(obj, list, ver, sql, datePr, arr){ 
         let li = document.createElement('li');
         let listSQL = "'" + list.join("','") + "'"
         let listOr = list.join(" OR ")
-        let b = "" //выгрузка с dev
-        let c = "" //загрузка на стенд
-        let tableOb = "";
-        let fildBase = ""
-        let fildRel = "X_RELEASE";
-        sql = ""
+        let tableOb = ""; //таблица в которой храняться объекты
+        let fildBase = "" //колонка по которому ищем объекты
+        let fildRel = "X_RELEASE"; //релиз
+        let admName = ""; //название объекта в АДМ
+        let seachSpec = ""; //фильтр
+        let wayOp = "" //режим внедрения
+        sql = "";
+        datePr = "";
+        arr = [];
         switch(obj) {
           case 'Pers.Applets':
-            b =  "Pers.Applets. Индивидуальная настройка - апплет. Запрос " + listOr +"<br> update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + listSQL + ");<br> commit;"
+            admName = "Personalization - Applets"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_CT_APPLET";
             fildBase = "APPLET_NAME";
             break;
           case 'Pers.Rules':
-            b =  "Pers.Rules. Перейти на страницу Индивидуальная настройка – набор правил. Поставить объектам: " + list + "  - версиию " + ver + " ."
+            admName = "Personalization - Rules"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_CT_RULE_SET";
             fildBase = "NAME";
             break;
           case 'Pers.Views':
-            b =  "FINS. Перейти на страницу Индивидуальная настройка - Представление. Поставить объектам: " + list + "  - версиию " + ver + " ."
+            admName = "Personalization – Views"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_APP_VIEW";
             fildBase = "NAME";
             break;
           case 'RTE': //необходимо поменять в проге лист + нужна функция
-            b =  "FINS. Перейти на страницу События обработки - События. Поставить объектам: " + list + "  - версиию " + ver + " ."
+            admName = "Personalization – Events"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_CT_EVENT";
             fildBase = "OBJ_NAME";
             break;
           case 'Pers.Actions':
-            b =  "FINS. Перейти на страницу События обработки - Наборы действий. Поставить объектам: " + list + "  - версиию " + ver + " ."
+            admName = "Personalization - Actions"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_CT_ACTION_SET";
             fildBase = "NAME";
             break;
           case 'DVM':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            admName = "ATC ADM Data Validation Message"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_ISS_VALDN_MSG";
             fildBase = "MSG_TYPE_CD";
             break;
-          case 'EAI Lookup Map':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          case 'EAI Lookup Map'://Тут есть примеры и вставить так и синхрон
+            admName = "ATC ADM EAI Lookup Map"
+            seachSpec = "[Type] in (" + listSQL + ")[ATC Release]='" + ver + "'"
+            wayOp = "Вставить"
             tableOb = "S_EAI_LOOKUPMAP";
             fildBase = "LOOKUP_TYPE";
             break;
           case 'EAI Data Map':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            admName = "EAI Data Map"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_INT_OBJMAP";
             fildBase = "NAME";
             break;
           case 'Comm Pkg':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+            admName = "ADM Comm Package"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_DMND_CRTN_PRG";
             fildBase = "NAME";
             break;
           case 'Inb.WS':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "Web Service - Inbound"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize" 
             tableOb = "S_WS_WEBSERVICE";
             fildBase = "NAME";
             break;
           case 'Out.WS':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "Web Service - Outbound"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_WS_WEBSERVICE";
             fildBase = "NAME";
             break;
           case 'DTU': //необходимо поменять в проге лист
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "DataMapObject"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_BUSOBJ_DMAP";
             fildBase = "NAME";
             break;
           case 'ATC Log Configuration':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "ATC Log Configuration"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "CX_LOG_CONFIG";
             fildBase = "NAME";
             break;
           case 'Audit Trail':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "Audit Trail Admin"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_AUDIT_BUSCOMP";
             fildBase = "BUSCOMP_NAME";
             break;
           case 'Wf Action Type':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "Workflow Action Type"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_ACTION_DEFN";
             fildBase = "ROW_ID"; //УТОЧНИТЬ!
             break;
           case 'Wf Policy':
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "Workflow Policy"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_ESCL_RULE";
             fildBase = "NAME"; //УТОЧНИТЬ!
             break;
           case 'АДМ - представление': //УТОЧНИТЬ!
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "View"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_APP_VIEW";
             fildBase = "NAME"; 
             break;
           case 'Responsibility': 
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "Responsibility"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_RESP";
             fildBase = "NAME"; 
             break;
           case 'SysPref ': 
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "ATC System Preferences"
+            seachSpec = "[Name] in (" + listSQL + ")"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_SYS_PREF";
             fildBase = "SYS_PREF_CD"; 
             break;
           case 'PDQ': 
-            b =  "SQL. update siebel.S_ISS_VALDN_MSG a set a.X_RELEASE = '" + ver + "' where MSG_TYPE_CD in(" + list + ");\n commit;"
+          admName = "PDQ "
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
             tableOb = "S_APP_QUERY";
             fildBase = "SYS_PREF_CD"; 
             break;
         }
         sql = "--" + obj + " <br> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where " + fildBase + " in (" + listSQL + ");<br> commit;<br>"
-        ol.appendChild(li);
-        li.innerHTML=li.innerHTML + b;
-        return sql;
+        datePr =  obj + ". Имя типа данных:<b> " + admName + ",</b> Режим внедрения <b>" + wayOp + "</b>, Фильтр для развертывания <b>" + seachSpec + "</b>.<br>"
+        //ol.appendChild(li);
+        //li.innerHTML=li.innerHTML + b; //добавляет li
+        arr = [sql, datePr]
+        return arr;
       }
       // Для инструкции
-      let sql =document.createElement('li');
+      let sql = document.createElement('li');
+      let datePr = document.createElement('li');
+      sql.innerHTML = "Прогнать на DEV следующие апдейты: <br>"
+      datePr.innerHTML = "Зайти на страницу Проекты для внедрения, создать проект с именем" + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
+      let arr = [];
       let listObj = [];
       let manualOut = "";
       let listOutOl = document.createElement('ol');
@@ -186,8 +235,12 @@
           div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
           listName.push(element);
         }
-        sql.innerHTML = sql.innerHTML + createListOfOut(sNameOb, listName, ver, sql)
+        arr = createListOfNoRepOut(sNameOb, listName, ver, sql, datePr);
+        console.log(arr[0])
+        sql.innerHTML = sql.innerHTML + arr[0]
+        datePr.innerHTML = datePr.innerHTML + arr[1]
       }
+      ol.prepend(datePr)
       ol.prepend(sql)
       //alert(sql)
       document.getElementById('renderListOfObj').appendChild(div);
