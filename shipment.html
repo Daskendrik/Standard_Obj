@@ -35,10 +35,15 @@
       if(ol) {ol.remove()};
       let result = "";
       let listOftd = null;
-      let sNameOb = null;
-      let sName = null;
+      let listName = []; //список объектов
+      let sNameOb = null; //Название объекта
+      let sName = null; //Именование объектов
+      let sql = document.createElement('li'); //sql для апдейта нерепозиторных
+      let dateOutPr = document.createElement('li'); //добавление в проект внедрения
+      let dateOutDV = document.createElement('li'); //экспорт DV
+      let arr = []; //данные из функции
 
-      function createListOfNoRepOut(obj, list, ver, sql, datePr, arr){ 
+      function createListOfNoRepOut(obj, list, ver, arr){ 
         let li = document.createElement('li');
         let listSQL = "'" + list.join("','") + "'"
         let listOr = list.join(" OR ")
@@ -48,8 +53,9 @@
         let admName = ""; //название объекта в АДМ
         let seachSpec = ""; //фильтр
         let wayOp = "" //режим внедрения
-        sql = "";
-        datePr = "";
+        let sql_f = ""; //sql на выходе из функции
+        let dateOutPr_f = ""; // информация для проекта
+        let dateOutDV_f = ""; // экспорт DV
         arr = [];
         switch(obj) {
           case 'Pers.Applets':
@@ -136,7 +142,7 @@
             tableOb = "S_BUSOBJ_DMAP";
             fildBase = "NAME";
             break;
-          case 'ATC Log Configuration':
+          case 'Log Conf.':
           admName = "ATC Log Configuration"
             seachSpec = "[ATC Release]='" + ver + "'"
             wayOp = "Синхронизация/Synchronize"
@@ -186,32 +192,45 @@
             fildBase = "SYS_PREF_CD"; 
             break;
           case 'PDQ': 
-          admName = "PDQ "
+            admName = "PDQ "
             seachSpec = "[ATC Release]='" + ver + "'"
             wayOp = "Синхронизация/Synchronize"
             tableOb = "S_APP_QUERY";
             fildBase = "SYS_PREF_CD"; 
             break;
+          case 'LOV': 
+            admName = "LOV "
+            seachSpec = "[ATC Release]='" + ver + "' AND [Name]<>'ATC_CONSTANT'"
+            wayOp = "Вставить"
+            tableOb = "S_LST_OF_VAL";
+            fildBase = "TYPE"; 
+            break;
+          case 'LOV Constant': 
+            admName = "LOV Constant "
+            seachSpec = "[List Of Values Parent (UDA).Value] = 'ATC_CONSTANT' AND [List Of Values Child (UDA).Type] = 'ATC_CONSTANT' AND [List Of Values Child (UDA).ATC Release] = '" + ver + "'"
+            wayOp = "Вставить"
+            tableOb = "S_LST_OF_VAL";
+            fildBase = "TYPE"; 
+            break;
+          case 'DV': 
+            dateOutDV_f = "Зайти на экран Наборы правил. Сделать поиск, где Имя " + list + ", а Статус - Активно. Необходимо проверить, что нет пересечений с новым релизом."
+            break;
         }
-        sql = "--" + obj + " <br> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where " + fildBase + " in (" + listSQL + ");<br> commit;<br>"
-        datePr =  obj + ". Имя типа данных:<b> " + admName + ",</b> Режим внедрения <b>" + wayOp + "</b>, Фильтр для развертывания <b>" + seachSpec + "</b>.<br>"
+        if(tableOb){
+          sql_f = "--" + obj + " <br> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where " + fildBase + " in (" + listSQL + ");<br> commit;<br>"
+        }
+        if(admName){
+          dateOutPr_f = "<b>" + obj + "</b>. Имя типа данных:<b> " + admName + ",</b> Режим внедрения <b>" + wayOp + "</b>, Фильтр для развертывания <b>" + seachSpec + "</b>.<br>"
+        }
         //ol.appendChild(li);
         //li.innerHTML=li.innerHTML + b; //добавляет li
-        arr = [sql, datePr]
+        arr = [sql_f, dateOutPr_f, dateOutDV_f]
         return arr;
       }
       // Для инструкции
-      let sql = document.createElement('li');
-      let datePr = document.createElement('li');
+      
       sql.innerHTML = "Прогнать на DEV следующие апдейты: <br>"
-      datePr.innerHTML = "Зайти на страницу Проекты для внедрения, создать проект с именем" + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
-      let arr = [];
-      let listObj = [];
-      let manualOut = "";
-      let listOutOl = document.createElement('ol');
-      let listOutLi = document.createElement('li');
-      listOutOl.setAttribute('id','outList');
-      let listName = [];
+      dateOutPr.innerHTML = "Зайти на страницу Проекты для внедрения, создать проект с именем " + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
 
       let listOftr = Array.from(document.querySelectorAll('tr'))
       listOftr = listOftr.slice(1)
@@ -235,12 +254,16 @@
           div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
           listName.push(element);
         }
-        arr = createListOfNoRepOut(sNameOb, listName, ver, sql, datePr);
+        arr = createListOfNoRepOut(sNameOb, listName, ver, sql, dateOutPr);
         console.log(arr[0])
         sql.innerHTML = sql.innerHTML + arr[0]
-        datePr.innerHTML = datePr.innerHTML + arr[1]
+        dateOutPr.innerHTML = dateOutPr.innerHTML + arr[1]
+        dateOutDV.innerHTML = dateOutDV.innerHTML + arr[2]
       }
-      ol.prepend(datePr)
+      dateOutPr.innerHTML = dateOutPr.innerHTML + "Падая по линку типа данных, проверяем, что все есть по списку объектов. Если все ОК, то нажимаем кнопку Разрешить. <br>Переходим на соседнюю вкладку Сеансы внедрения. Cоздаем сеанс. Выбираем созданный проект. Нажимаем Внедрить. Данные необходимо сохранять по пути  'D:\\ses\\siebsrvr\\TEMP'. Полученные файлы (без _des), сохраняем в патч, в папку ADM. Файл, где только айди, переименовываем по типу X-XX (например 1-04 для патча xx.x.4)"
+      //тут надо будет последовательность делать
+      ol.prepend(dateOutDV)
+      ol.prepend(dateOutPr)
       ol.prepend(sql)
       //alert(sql)
       document.getElementById('renderListOfObj').appendChild(div);
@@ -262,8 +285,8 @@
 </head>
 <body>
     <form>
-        <h3>Ввод объектов</h3>
-        <p>Версия патча <input type="text" id="ver"></p>
+        <h3>Ввод данных</h3>
+        <p>Версия патча <input type="text" id="ver"> Стенд <input type="text" id="stend"></p>
         <table class="table" id="tObj">
             <thead>
               <tr>
