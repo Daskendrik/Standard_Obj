@@ -38,10 +38,24 @@
       let listName = []; //список объектов
       let sNameOb = null; //Название объекта
       let sName = null; //Именование объектов
-      let sql = document.createElement('li'); //sql для апдейта нерепозиторных
-      let dateOutPr = document.createElement('li'); //добавление в проект внедрения
-      let dateOutDV = document.createElement('li'); //экспорт DV
+      //Для инструкций
       let arr = []; //данные из функции
+      //Нерепозиторка
+      let sql = document.createElement('li'); //sql для апдейта нерепозиторных
+      let sqlFlag = "N";
+      let dateOutPr = document.createElement('li'); //добавление в проект внедрения
+      let prFlag = "N";
+      //DV
+      let dateOutDV = document.createElement('li'); //экспорт DV
+      let DVFlag = "N";
+      //Конфигцрация телефонии 
+      let dateOutConf = document.createElement('li');
+      let confFlag = "N";
+      //EFS
+      let dateOutEFS = document.createElement('li');
+      let EFSFlag = "N"
+
+      let stendInfo =""//////////////////////////////////////////////////////////////////////////////////<----тут остановилась
 
       function createListOfNoRepOut(obj, list, ver, arr){ 
         let li = document.createElement('li');
@@ -56,6 +70,8 @@
         let sql_f = ""; //sql на выходе из функции
         let dateOutPr_f = ""; // информация для проекта
         let dateOutDV_f = ""; // экспорт DV
+        let dateOutConf_f ="";
+        let dateOutEFS_f = "";
         arr = [];
         switch(obj) {
           case 'Pers.Applets':
@@ -213,18 +229,35 @@
             fildBase = "TYPE"; 
             break;
           case 'DV': 
-            dateOutDV_f = "Зайти на экран Наборы правил. Сделать поиск, где Имя " + list + ", а Статус - Активно. Необходимо проверить, что нет пересечений с новым релизом."
+            dateOutDV_f = "<b>DV</b><br>Зайти на экран Наборы правил. Сделать поиск, где Имя <mark><code>" + listOr + ",</mark></code> а Статус - <b>Активно</b>. Необходимо проверить, что нет пересечений с новым релизом. Шестеренка - > экспорт. Полученный файл переместить в папку DV"
             break;
-        }
+          case 'Конфигурация телефонии':
+            dateOutConf_f = "Зайти на страницу <b>АДМ – коммуникации, Конфигурации</b>. Найти конфигурацию по имени <mark><code>" + listOr + "</mark></code>. Шестеренка - > экспорт. При экспорте выбираем первые 3 параметра (Параметры конфигурации, Команды, События). Полученный файл переместить в папку Конфигурация"
+            break;
+          case 'ATC EFS':
+            wayOp = 'Upsert';
+            admName = 'ATC EFS ADM';
+            sql_f = list.map(item=>"[ATC EFS Container.Code] = '" + item + "'");
+            listOr = sql_f.join(" OR ")
+            seachSpec = "[ATC EFS Profile.Code] = 'HCP' AND (" + listOr + ")"
+            break;        
+          }
         if(tableOb){
-          sql_f = "--" + obj + " <br> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where " + fildBase + " in (" + listSQL + ");<br> commit;<br>"
+          sql_f = "--" + obj + "<br><mark><code> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where " + fildBase + " in (" + listSQL + ");<br> commit;</mark></code><br>"
         }
         if(admName){
-          dateOutPr_f = "<b>" + obj + "</b>. Имя типа данных:<b> " + admName + ",</b> Режим внедрения <b>" + wayOp + "</b>, Фильтр для развертывания <b>" + seachSpec + "</b>.<br>"
+          dateOutPr_f = "<i>" + obj + "</i>. Имя типа данных:<b> " + admName + ",</b> Режим внедрения <b>" + wayOp + "</b>, Фильтр для развертывания <mark><code>" + seachSpec + "</mark></code>.<br>"
         }
+        if(admName == "ATC EFS ADM"){
+          list = list.map(item=>"[Table Name] = '" + item + "'")
+          listOr = list.join(" OR ")
+          dateOutPr_f += "Необходимо раскрыть Имя типа данных (всего 3 ступени) и проверить/изменить <i>Фильтр</i>. Для ATC EFS Manage Profile ADM =<mark><code>" + listOr +"</code></mark>, а ATC EFS Profile ADM = <mark><code>[ATC EFS Profile.Code] = 'HCP' AND (" + listOr + ")  AND [ATC EFS Profile Params.Name] IS NULL AND [ATC EFS Container Params.Name] IS NULL AND [ATC EFS Container Meta.Name] IS NULL</mark></code><br>";
+          sql_f = ""
+        }
+
         //ol.appendChild(li);
         //li.innerHTML=li.innerHTML + b; //добавляет li
-        arr = [sql_f, dateOutPr_f, dateOutDV_f]
+        arr = [sql_f, dateOutPr_f, dateOutDV_f,dateOutConf_f,dateOutEFS_f]
         return arr;
       }
       // Для инструкции
@@ -255,17 +288,36 @@
           listName.push(element);
         }
         arr = createListOfNoRepOut(sNameOb, listName, ver, sql, dateOutPr);
-        console.log(arr[0])
-        sql.innerHTML = sql.innerHTML + arr[0]
-        dateOutPr.innerHTML = dateOutPr.innerHTML + arr[1]
-        dateOutDV.innerHTML = dateOutDV.innerHTML + arr[2]
+        
+        if(arr[0] != "") {
+          sql.innerHTML = sql.innerHTML + arr[0]
+          sqlFlag = "Y"
+        }
+        if(arr[1]){
+          dateOutPr.innerHTML = dateOutPr.innerHTML + arr[1]
+          prFlag = "Y"
+        }
+        if(arr[2]){
+          dateOutDV.innerHTML = dateOutDV.innerHTML + arr[2]
+          DVFlag = "Y"
+        }
+        if(arr[3]){
+          dateOutConf.innerHTML = dateOutConf.innerHTML + arr[3]
+          confFlag = "Y"
+        }
+        
       }
       dateOutPr.innerHTML = dateOutPr.innerHTML + "Падая по линку типа данных, проверяем, что все есть по списку объектов. Если все ОК, то нажимаем кнопку Разрешить. <br>Переходим на соседнюю вкладку Сеансы внедрения. Cоздаем сеанс. Выбираем созданный проект. Нажимаем Внедрить. Данные необходимо сохранять по пути  'D:\\ses\\siebsrvr\\TEMP'. Полученные файлы (без _des), сохраняем в патч, в папку ADM. Файл, где только айди, переименовываем по типу X-XX (например 1-04 для патча xx.x.4)"
+      //Собираем нерепозиторные объекты
+
+      //Данные стенда
+
       //тут надо будет последовательность делать
-      ol.prepend(dateOutDV)
-      ol.prepend(dateOutPr)
-      ol.prepend(sql)
-      //alert(sql)
+      if(confFlag == "Y"){ol.prepend(dateOutConf)}
+      if(DVFlag == "Y"){ol.prepend(dateOutDV)}
+      if(prFlag == "Y"){ol.prepend(dateOutPr)}
+      if(sqlFlag == "Y"){ol.prepend(sql)}
+      
       document.getElementById('renderListOfObj').appendChild(div);
       
     }
