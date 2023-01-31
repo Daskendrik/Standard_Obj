@@ -27,8 +27,10 @@
     function createList() {
       let  div = document.querySelector('div')
       let  ver = document.getElementById('ver')
+      let  int = document.getElementById('int')
       let ol = document.querySelector('ol')
       ver = ver.value;
+      int = int.value;
       console.log(div)
       if(div) {div.remove()};
       div = document.createElement('div');
@@ -55,9 +57,13 @@
       let dateOutEFS = document.createElement('li');
       let EFSFlag = "N"
 
-      let stendInfo =""//////////////////////////////////////////////////////////////////////////////////<----тут остановилась
+      let stendInfo =""//////////////////////////////////////////////////////////////////////////////////<----тут остановилась добавить Navigation Links
+      
+      function createUpdateRTE(list) { //list BusComp - ATC Client Consent - WriteRecord - ATC Contact Sync Data, BusComp - ATC Client Consent - WriteRecord - ATC Contact Sync Data
+        let obj_name_rte = ''
+      }
 
-      function createListOfNoRepOut(obj, list, ver, arr){ 
+      function createListOfNoRepOut(obj, list, ver, int, arr){ 
         let li = document.createElement('li');
         let listSQL = "'" + list.join("','") + "'"
         let listOr = list.join(" OR ")
@@ -118,7 +124,9 @@
             break;
           case 'EAI Lookup Map'://Тут есть примеры и вставить так и синхрон
             admName = "ATC ADM EAI Lookup Map"
-            seachSpec = "[Type] in (" + listSQL + ")[ATC Release]='" + ver + "'"
+            sql_f = list.map(item=>"[Type] = '" + item + "'");
+            listOr = sql_f.join(" OR ")
+            seachSpec = "(" + listOr + ") AND [ATC Release]='" + ver + "'"
             wayOp = "Вставить"
             tableOb = "S_EAI_LOOKUPMAP";
             fildBase = "LOOKUP_TYPE";
@@ -215,18 +223,18 @@
             fildBase = "SYS_PREF_CD"; 
             break;
           case 'LOV': 
-            admName = "LOV "
+            admName = "LOV"
             seachSpec = "[ATC Release]='" + ver + "' AND [Name]<>'ATC_CONSTANT'"
             wayOp = "Вставить"
             tableOb = "S_LST_OF_VAL";
-            fildBase = "TYPE"; 
+            fildBase = "VAL"; 
             break;
           case 'LOV Constant': 
-            admName = "LOV Constant "
+            admName = "LOV"
             seachSpec = "[List Of Values Parent (UDA).Value] = 'ATC_CONSTANT' AND [List Of Values Child (UDA).Type] = 'ATC_CONSTANT' AND [List Of Values Child (UDA).ATC Release] = '" + ver + "'"
             wayOp = "Вставить"
             tableOb = "S_LST_OF_VAL";
-            fildBase = "TYPE"; 
+            fildBase = "NAME"; 
             break;
           case 'DV': 
             dateOutDV_f = "<b>DV</b><br>Зайти на экран Наборы правил. Сделать поиск, где Имя <mark><code>" + listOr + ",</mark></code> а Статус - <b>Активно</b>. Необходимо проверить, что нет пересечений с новым релизом. Шестеренка - > экспорт. Полученный файл переместить в папку DV"
@@ -243,7 +251,13 @@
             break;        
           }
         if(tableOb){
-          sql_f = "--" + obj + "<br><mark><code> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where " + fildBase + " in (" + listSQL + ");<br> commit;</mark></code><br>"
+          sql_f = "--" + obj + "<br><mark><code> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where a." + fildBase + " in (" + listSQL + ")"//");<br> commit;</mark></code><br>"
+          if(admName == "LOV" || admName == "LOV Constant"){
+            sql_f += " and a.ws_id = (select s.row_id from S_WORKSPACE s where s.Name = '" + int + "');<br> commit;</mark></code><br>"
+          }
+          else {
+            sql_f += ";<br> commit;</mark></code><br>"
+          }
         }
         if(admName){
           dateOutPr_f = "<i>" + obj + "</i>. Имя типа данных:<b> " + admName + ",</b> Режим внедрения <b>" + wayOp + "</b>, Фильтр для развертывания <mark><code>" + seachSpec + "</mark></code>.<br>"
@@ -265,7 +279,7 @@
       sql.innerHTML = "Прогнать на DEV следующие апдейты: <br>"
       dateOutPr.innerHTML = "Зайти на страницу Проекты для внедрения, создать проект с именем " + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
 
-      let listOftr = Array.from(document.querySelectorAll('tr'))
+      let listOftr = Array.from(document.getElementById('tObj').querySelectorAll('tr'))
       listOftr = listOftr.slice(1)
 
       ol = document.createElement('ol');
@@ -281,13 +295,16 @@
         div.innerHTML += "<b> " + sNameOb + "</b>"
         sName = listOftd[1].querySelectorAll('textarea')[0].value
         sName = sName.split(',')
+        let regexp = /^\s+|\s+$/
+        sName = sName.map(item=>item.replace(regexp,""))
+        console.log(sName)
         listName = [];
         for (let j = 0; j < sName.length; j++) { // Тут название самих объектов
           const element = sName[j];
           div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
           listName.push(element);
         }
-        arr = createListOfNoRepOut(sNameOb, listName, ver, sql, dateOutPr);
+        arr = createListOfNoRepOut(sNameOb, listName, ver, int);
         
         if(arr[0] != "") {
           sql.innerHTML = sql.innerHTML + arr[0]
@@ -337,8 +354,22 @@
 </head>
 <body>
     <form>
-        <h3>Ввод данных</h3>
-        <p>Версия патча <input type="text" id="ver"> Стенд <input type="text" id="stend"></p>
+      <h3>Ввод данных</h3>
+      <table>
+        <tr style="height: 50px;">
+          <td style="padding-right: 10px;">Версия патча</td>
+          <td><input type="text" id="ver" placeholder="XX.X.X"></td>
+        </tr style="height: 50px;">
+        <tr style="margin-top: 10px;">
+          <td style="padding-right: 10px;">Текущий int <br>в разработке</td>
+          <td><input type="text" id="int" placeholder="int_XX"></td>
+        </tr>
+        <tr style="height: 50px;">
+          <td style="padding-right: 10px;">Стенд</td>
+          <td><input type="text" id="stend"></td>
+        </tr>
+      </table>
+        <!-- <p>Версия патча <input type="text" id="ver"></p><p> Текущий int в разработке <input type="text" id="int"></p><p> Стенд <input type="text" id="stend"></p> -->
         <table class="table" id="tObj">
             <thead>
               <tr>
