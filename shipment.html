@@ -18,7 +18,7 @@
         let td3 = newRow.insertCell(2);
         td1.innerHTML = `<input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
                 <datalist id="datalistOptions">
-                  <option value='Pers.Applets'><option value='Pers.Rules'><option value='Pers.Views'><option value='Pers.Events'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
+                  <option value='Navigation Links'><option value='Pers.Applets'><option value='DTU'><option value='Pers.Rules'><option value='Pers.Views'><option value='RTE'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
                 </datalist>`
         td2.innerHTML = `<textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;">`
         td3.innerHTML = `<button id = '`+indexRow+`'type="button" class="btn btn-dark" onclick = deleteRowIndex(this.id)>Удалить строку</button>`
@@ -59,11 +59,20 @@
 
       let stendInfo =""//////////////////////////////////////////////////////////////////////////////////<----тут остановилась добавить Navigation Links
       
-      function createUpdateRTE(list) { //list BusComp - ATC Client Consent - WriteRecord - ATC Contact Sync Data, BusComp - ATC Client Consent - WriteRecord - ATC Contact Sync Data
-        let obj_name_rte = ''
+      function createUpdateRTE(list, regexp) { //list BusComp - ATC Client Consent - WriteRecord - ATC Contact Sync Data, BusComp - ATC Client Consent - WriteRecord - ATC Contact Sync Data
+        //let reg = /\s+-|-\s+/g;
+        //let list_a = list.map(item=>item.replace(reg,""));
+        let a = '';
+        for (let i = 0; i < list.length; i++) {
+          let element = list[i];
+          element = element.split("-");
+          element = element.map(item=>item.replace(regexp,""))
+          a += "<mark><code>update siebel.S_CT_EVENT a set a.X_RELEASE = '47.0.5' where a.OBJ_TYPE_CD = '" + element[0] + "' AND a.OBJ_NAME = '" + element[1] + "' AND a.EVT_SUB_NAME = '" + element[2] + "' AND a.EVT_NAME = '" + element[3] + "';<br>commit;</mark></code><br>"   
+        }
+        return a;
       }
 
-      function createListOfNoRepOut(obj, list, ver, int, arr){ 
+      function createListOfNoRepOut(obj, list, ver, int, regexp, arr){ 
         let li = document.createElement('li');
         let listSQL = "'" + list.join("','") + "'"
         let listOr = list.join(" OR ")
@@ -76,8 +85,8 @@
         let sql_f = ""; //sql на выходе из функции
         let dateOutPr_f = ""; // информация для проекта
         let dateOutDV_f = ""; // экспорт DV
-        let dateOutConf_f ="";
-        let dateOutEFS_f = "";
+        let dateOutConf_f =""; //экспорт конфигурации
+        let dateOutEFS_f = ""; //экспорт файловой системы
         arr = [];
         switch(obj) {
           case 'Pers.Applets':
@@ -101,12 +110,13 @@
             tableOb = "S_APP_VIEW";
             fildBase = "NAME";
             break;
-          case 'RTE': //необходимо поменять в проге лист + нужна функция
+          case 'RTE': 
             admName = "Personalization – Events"
             seachSpec = "[ATC Release]='" + ver + "'"
             wayOp = "Синхронизация/Synchronize"
-            tableOb = "S_CT_EVENT";
-            fildBase = "OBJ_NAME";
+            console.log(list)
+            sql_f = "--RTE<br>"
+            sql_f += createUpdateRTE(list, regexp)
             break;
           case 'Pers.Actions':
             admName = "Personalization - Actions"
@@ -159,8 +169,8 @@
             tableOb = "S_WS_WEBSERVICE";
             fildBase = "NAME";
             break;
-          case 'DTU': //необходимо поменять в проге лист
-          admName = "DataMapObject"
+          case 'DTU': 
+            admName = "DataMapObject"
             seachSpec = "[ATC Release]='" + ver + "'"
             wayOp = "Синхронизация/Synchronize"
             tableOb = "S_BUSOBJ_DMAP";
@@ -208,12 +218,19 @@
             tableOb = "S_RESP";
             fildBase = "NAME"; 
             break;
-          case 'SysPref ': 
-          admName = "ATC System Preferences"
+          case 'SysPref': 
+            admName = "ATC System Preferences"
             seachSpec = "[Name] in (" + listSQL + ")"
             wayOp = "Синхронизация/Synchronize"
             tableOb = "S_SYS_PREF";
             fildBase = "SYS_PREF_CD"; 
+            break;
+          case 'Navigation Links': 
+            admName = "ATC ADM Navigation Links"
+            seachSpec = "[ATC Release]='" + ver + "'"
+            wayOp = "Синхронизация/Synchronize"
+            tableOb = "S_NAV_LINK";
+            fildBase = "NAME"; 
             break;
           case 'PDQ': 
             admName = "PDQ "
@@ -250,6 +267,7 @@
             seachSpec = "[ATC EFS Profile.Code] = 'HCP' AND (" + listOr + ")"
             break;        
           }
+          console.log(sql_f)
         if(tableOb){
           sql_f = "--" + obj + "<br><mark><code> update siebel." + tableOb + " a set a." + fildRel + " = '" + ver + "' where a." + fildBase + " in (" + listSQL + ")"//");<br> commit;</mark></code><br>"
           if(admName == "LOV" || admName == "LOV Constant"){
@@ -295,7 +313,7 @@
         div.innerHTML += "<b> " + sNameOb + "</b>"
         sName = listOftd[1].querySelectorAll('textarea')[0].value
         sName = sName.split(',')
-        let regexp = /^\s+|\s+$/
+        let regexp = /^\s+|\s+$/g
         sName = sName.map(item=>item.replace(regexp,""))
         console.log(sName)
         listName = [];
@@ -304,7 +322,7 @@
           div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
           listName.push(element);
         }
-        arr = createListOfNoRepOut(sNameOb, listName, ver, int);
+        arr = createListOfNoRepOut(sNameOb, listName, ver, int, regexp);
         
         if(arr[0] != "") {
           sql.innerHTML = sql.innerHTML + arr[0]
@@ -330,6 +348,7 @@
       //Данные стенда
 
       //тут надо будет последовательность делать
+      ol.prepend()
       if(confFlag == "Y"){ol.prepend(dateOutConf)}
       if(DVFlag == "Y"){ol.prepend(dateOutDV)}
       if(prFlag == "Y"){ol.prepend(dateOutPr)}
@@ -382,7 +401,7 @@
                 <td>
                     <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
                     <datalist id="datalistOptions">
-                      <option value='Pers.Applets'><option value='Pers.Rules'><option value='Pers.Views'><option value='Pers.Events'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
+                      <option value='Navigation Links'></option><option value='Pers.Applets'><option value='DTU'></option><option value='Pers.Rules'><option value='Pers.Views'><option value='RTE'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
                     </datalist>
                 </td>
                 <td><textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;"></textarea></td>
