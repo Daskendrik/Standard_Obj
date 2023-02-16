@@ -93,31 +93,24 @@ function createList() {
   }
   function createListOfNoRepOut(obj, list, ver, int, regexp, arr){  //формирование данных для НЕРЕПОЗИТОРНЫХ
     function OneObj(name) {
-        this.name = name;
-        this.admName = '';
-        this.seachSpec = '';
-        this.wayOp = '';
-        this.tableOb = '';
-        this.fildBase = '';
-        this.sql_f = ''
+        this.name = name; //режим внедрения
+        this.admName = ''; //название объекта в АДМ
+        this.seachSpec = ''; //фильтр
+        this.wayOp = ''; //режим внедрения
+        this.tableOb = ''; //таблица в которой храняться объекты
+        this.fildBase = ''; //колонка по которому ищем объекты
+        this.fildRel = "X_RELEASE"; //релиз
+        this.sql_f = ''; //sql
+        this.dateOutDV_f = ""; // экспорт DV
+        this.dateOutConf_f =""; //экспорт конфигурации
+        this.dateOutEFS_f = ""; //экспорт файловой системы
+        this.dateOutsqlScr_f = ""; //экспорт sql скриптов
+        this.dateOutFile_f = ""; //экспорт файлов
+        this.dateOutPKG_f = ""; //экспорт пакетов
 
     };
     let listSQL = "'" + list.join("','") + "'"
     let listOr = list.join(" OR ")
-    let tableOb = ""; //таблица в которой храняться объекты
-    let fildBase = "" //колонка по которому ищем объекты
-    let fildRel = "X_RELEASE"; //релиз
-    let admName = ""; //название объекта в АДМ
-    let seachSpec = ""; //фильтр
-    let wayOp = "" //режим внедрения
-    let sql_f = ""; //sql на выходе из функции
-    let dateOutPr_f = ""; // информация для проекта
-    let dateOutDV_f = ""; // экспорт DV
-    let dateOutConf_f =""; //экспорт конфигурации
-    let dateOutEFS_f = ""; //экспорт файловой системы
-    let dateOutsqlScr_f = ""; //экспорт sql скриптов
-    let dateOutFile_f = ""; //экспорт файлов
-    let dateOutPKG_f = ""; //экспорт пакетов
     let objOut = new OneObj('Nope');
     arr = [];
     switch(obj) {
@@ -332,7 +325,6 @@ function createList() {
       case 'PKG':
         objOut.dateOutPKG_f = 'Необходимо добавить файл PKG в папку \\db'
       }
-      console.log(sql_f)
     if(objOut.tableOb){
         objOut.sql_f = "--" + obj + "<br><mark><code> update siebel." + objOut.tableOb + " a set a." + objOut.fildRel + " = '" + ver + "' where a." + objOut.fildBase + " in (" + objOut.listSQL + ")"//");<br> commit;</mark></code><br>"
     if(objOut.admName == "LOV" || objOut.admName == "LOV Constant"){
@@ -387,32 +379,32 @@ function createList() {
     arr = createListOfNoRepOut(sNameOb, listName, ver, int, regexp);
     console.log(arr)
     
-    if(arr[0] != "") {
-      sql.innerHTML = sql.innerHTML + arr[0]
+    if(arr.sql_f != "") {
+      sql.innerHTML = sql.innerHTML + arr.sql_f
       sqlFlag = "Y"
     }
-    if(arr[1]){
-      dateOutPr.innerHTML = dateOutPr.innerHTML + arr[1]
+    if(arr.dateOutPr_f){
+      dateOutPr.innerHTML = dateOutPr.innerHTML + arr.dateOutPr_f
       prFlag = "Y"
     }
-    if(arr[2]){
-      dateOutDV.innerHTML = dateOutDV.innerHTML + arr[2]
+    if(arr.dateOutDV_f){
+      dateOutDV.innerHTML = dateOutDV.innerHTML + arr.dateOutDV_f
       DVFlag = "Y"
     }
-    if(arr[3]){
-      dateOutConf.innerHTML = dateOutConf.innerHTML + arr[3]
+    if(arr.dateOutConf_f){
+      dateOutConf.innerHTML = dateOutConf.innerHTML + arr.dateOutConf_f
       confFlag = "Y"
     }
-    if(arr[4]){
-      dateSQLScr.innerHTML = dateSQLScr.innerHTML + arr[4]
+    if(arr.dateOutsqlScr_f){
+      dateSQLScr.innerHTML = dateSQLScr.innerHTML + arr.dateOutsqlScr_f
       sqlScrFlag = "Y"
     }
-    if(arr[5] && fileFlag == "N"){
-      dateOutFile.innerHTML = dateOutFile.innerHTML + arr[5]
+    if(arr.dateOutFile_f && fileFlag == "N"){
+      dateOutFile.innerHTML = dateOutFile.innerHTML + arr.dateOutFile_f
       fileFlag = "Y"
     }
-    if(arr[6]){
-      datePKG.innerHTML = datePKG.innerHTML + arr[6]
+    if(arr.dateOutPKG_f){
+      datePKG.innerHTML = datePKG.innerHTML + arr.dateOutPKG_f
       datePKGFlag = "Y"
     }
     
