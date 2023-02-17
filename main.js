@@ -31,6 +31,7 @@ function createList() {
   let  div = document.querySelector('div')
   let  ver = document.getElementById('ver')
   let  int = document.getElementById('int')
+  let fullRRFlg = document.getElementById('fullRRFlg').checked
   let ol = document.querySelector('ol')
   ver = ver.value;
   int = int.value;
@@ -71,10 +72,18 @@ function createList() {
   createFolder.innerHTML = "Необходимо создать папки <br> На локальной машине как вам удобно или " + ver + ".<br> На dev по пути \\10.125.8.59\\d$\\ses в вашей папке " + ver.replace(folderReg,'_') + ". <br> На стенде тоже папку любую или " + ver + "."
   //Экспорт репозитория
   let exportRep = document.createElement('li');
-  exportRep.innerHTML = 'Для экспорта репозитория заходим на dev, в командной строке вбиваем следующую команду: <br><mark><code> D:\\ses\\siebsrvr\\BIN\\repimexp.exe /l d:\\dkolcheganova_temp_box\\Repositories\\' + ver.replace(folderReg,'_') + '\\repexport_' + ver.replace(folderReg,'_') + '.log /p SADMIN /d SIEBEL /Y "' + document.getElementById('markEx').value + '"  /r "Siebel Repository" /f d:\\dkolcheganova_temp_box\\Repositories\\'  + ver.replace(folderReg,'_') +  '\\repexport_'  + ver.replace(folderReg,'_') +  '.dat /c LETO_DEV_DSN /A O /u SADMIN </mark></code><br> Можно переименовать полученный файл, и переместить его в патч в папку repository'
+  if(fullRRFlg) {
+    exportRep.innerHTML = 'Для экспорта репозитория и схемы заходим в Migration под Sadmin. Далее заходим в Migration Plans, выбираем редактировать RR Full Export. В октрывшимся окне, внизу убираем галочку Application Workspace Data Service, и опять ее ставим. В открывшимся окне вбыираем нужный нам int. Далее слева заходим в Execution и нажимаем плей RR Full Export . После экспорта появится файл по пути \\10.125.8.59\\d$\\sfs\\migration\\ . Файл типо ddlexport_3A063EA767DE.ctl Сохраняем его в патче в папке scheme, а файл типо repexport_3A07919A9EF6 в папку repository'
+  } else {
+    exportRep.innerHTML = 'Для экспорта репозитория заходим на dev, в командной строке вбиваем следующую команду: <br><mark><code> D:\\ses\\siebsrvr\\BIN\\repimexp.exe /l d:\\dkolcheganova_temp_box\\Repositories\\' + ver.replace(folderReg,'_') + '\\repexport_' + ver.replace(folderReg,'_') + '.log /p SADMIN /d SIEBEL /Y "' + document.getElementById('markEx').value + '"  /r "Siebel Repository" /f d:\\dkolcheganova_temp_box\\Repositories\\'  + ver.replace(folderReg,'_') +  '\\repexport_'  + ver.replace(folderReg,'_') +  '.dat /c LETO_DEV_DSN /A O /u SADMIN </mark></code><br> Можно переименовать полученный файл, и переместить его в патч в папку repository'
+  }
+  
   //Экспорт схемы
   let exportShem = document.createElement('li');
-  exportShem.innerHTML = 'Для экспорта схемы заходим в Migration под Sadmin, далее Execution и нажимаем плей Scheme Export. После экспорта появится файл по пути \\10.125.8.59\\d$\\sfs\\migration\\ . Файл типо ddlexport_3A063EA767DE.ctl Сохраняем его в патче в папке scheme'
+  if(!fullRRFlg) {
+    exportShem.innerHTML = 'Для экспорта схемы заходим в Migration под Sadmin, далее Execution и нажимаем плей Scheme Export. После экспорта появится файл по пути \\10.125.8.59\\d$\\sfs\\migration\\ . Файл типо ddlexport_3A063EA767DE.ctl Сохраняем его в патче в папке scheme'
+  }
+  
   //Экспорт других sql скриптов
   let dateSQLMain = document.createElement('li');
   dateSQLMain.innerHTML = "Сборка постоянных скриптов: <br>Release - указываем тут какой патч/релиз устанавливается<br>MANIFESTS - отключаем ненужные манифесты(очень аккуратно, иногда это необходимо делать поименно)"
@@ -107,6 +116,7 @@ function createList() {
         this.dateOutsqlScr_f = ""; //экспорт sql скриптов
         this.dateOutFile_f = ""; //экспорт файлов
         this.dateOutPKG_f = ""; //экспорт пакетов
+        this.fildBase = ""
 
     };
     let listSQL = "'" + list.join("','") + "'"
@@ -166,7 +176,7 @@ function createList() {
         objOut.name = "ADM"  
         objOut.admName = "ATC ADM EAI Lookup Map"
         objOut.sql_f = list.map(item=>"[Type] = '" + item + "'");
-        listOr = sql_f.join(" OR ")
+        listOr = objOut.sql_f.join(" OR ")
         objOut.seachSpec = "(" + listOr + ") AND [ATC Release]='" + ver + "'"
         objOut.wayOp = "Вставить"
         objOut.tableOb = "S_EAI_LOOKUPMAP";
@@ -311,7 +321,7 @@ function createList() {
         objOut.wayOp = 'Upsert';
         objOut.admName = 'ATC EFS ADM';
         objOut.sql_f = list.map(item=>"[ATC EFS Container.Code] = '" + item + "'");
-        listOr = sql_f.join(" OR ")
+        listOr = objOut.sql_f.join(" OR ")
         objOut.seachSpec = "[ATC EFS Profile.Code] = 'HCP' AND (" + listOr + ")"
         break;
       case 'sql':
@@ -326,7 +336,7 @@ function createList() {
         objOut.dateOutPKG_f = 'Необходимо добавить файл PKG в папку \\db'
       }
     if(objOut.tableOb){
-        objOut.sql_f = "--" + obj + "<br><mark><code> update siebel." + objOut.tableOb + " a set a." + objOut.fildRel + " = '" + ver + "' where a." + objOut.fildBase + " in (" + objOut.listSQL + ")"//");<br> commit;</mark></code><br>"
+        objOut.sql_f = "--" + obj + "<br><mark><code> update siebel." + objOut.tableOb + " a set a." + objOut.fildRel + " = '" + ver + "' where a." + objOut.fildBase + " in (" + listSQL + ")"//");<br> commit;</mark></code><br>"
     if(objOut.admName == "LOV" || objOut.admName == "LOV Constant"){
         objOut.sql_f += " and a.ws_id = (select s.row_id from S_WORKSPACE s where s.Name = '" + int + "');<br> commit;</mark></code><br>"
       }

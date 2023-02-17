@@ -442,7 +442,8 @@
         <tr style="margin-top: 10px;">
           <td style="padding-right: 10px; padding-left: 10px;">Текущий int <br>в разработке</td>
           <td><input type="text" id="int" placeholder="int_XX"></td>
-          <td style="padding-right: 10px; padding-left: 20px;" colspan="2"><button type="button" class="btn btn-primary" onclick="createWaterMark()">Создать WaterMark для экспорта</button></td>
+          <td style="padding-right: 10px; padding-left: 20px;"><button type="button" class="btn btn-primary" onclick="createWaterMark()">Создать WaterMark для экспорта</button></td>
+          <td>fullRR? <input type="checkbox" id = 'fullRRFlg'></td>
           <td style="border: 1px dotted black;">int_48: 2022-11-24 <b>На тесте</b></td>
         </tr>
         <tr style="height: 50px;">
@@ -484,16 +485,25 @@
     <section id = 'renderList'>
       <h3>Инструкция по сборке</h3>
     </section>
+    <section>
+      <h3>Инструкции по Установке</h3>
+      <table style="margin-bottom: 20px;" id = 'dateFile'>
+        <tr>
+          <td style="padding-right: 10px; padding-left: 20px;">Полученный ddl файл</td>
+          <td><input type="text" id="DDLFileName" placeholder="ddlexport_3A0782AE0053"></td><br>
+        </tr>
+        <tr>
+          <td style="padding-right: 10px; padding-left: 20px;">Полученный репозиторий <br>файл</td>
+          <td><input type="text" id="RepFileName" placeholder="repexport_3A07919A9EF6"></td>
+        </tr>
+      </table>
+      <button type="button" class="btn btn-primary" onclick = "addRow('ObjectName')">Сформировать инструкцию</button> 
+    </section>
     <section id = 'renderToStend'>
-      <h3>Инструкция по установки на стенд</h3>
-      <td style="padding-right: 10px; padding-left: 20px;">Полученный ddl файл</td>
-      <td><input type="text" id="dataInt" placeholder="ddlexport_3A0782AE0053"></td>
-      <button type="button" class="btn btn-primary" onclick = "addRow('ObjectName')">Сформировать инструкцию</button> <p></p>
+      <h3>По установки на стенд</h3>
     </section>
     <section id = 'renderForBank'>
-      <h3>Инструкция для банка</h3>
-      <td style="padding-right: 10px; padding-left: 20px;">Полученный ddl файл</td>
-      <td><input type="text" id="dataInt" placeholder="ddlexport_3A0782AE0053"></td>
+      <h3>Для банка</h3>
     </section>
 </body>
 </html>
