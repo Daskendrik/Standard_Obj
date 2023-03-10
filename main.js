@@ -8,7 +8,7 @@ function addRow(tableID){
     let td3 = newRow.insertCell(2);
     td1.innerHTML = `<input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
             <datalist id="datalistOptions">
-              <option value='Navigation Links'><option value='Pers.Applets'><option value='DTU'><option value='Data Map'><option value='PKG'><option value='Pers.Rules'><option value='Pers.Views'><option value='RTE'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
+              <option value='Navigation Links'><option value='JMS Profile'><option value='Pers.Applets'><option value='DTU'><option value='Data Map'><option value='PKG'><option value='Pers.Rules'><option value='Pers.Views'><option value='RTE'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
             </datalist>`
     td2.innerHTML = `<textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;">`
     td3.innerHTML = `<button id = '`+indexRow+`'type="button" class="btn btn-dark" onclick = deleteRowIndex(this.id)>Удалить строку</button>`
@@ -69,7 +69,7 @@ function createList() {
   //Создание папок
   let createFolder = document.createElement('li');
   let folderReg = /\./g
-  createFolder.innerHTML = "Необходимо создать папки <br> На локальной машине как вам удобно или " + ver + ".<br> На dev по пути \\10.125.8.59\\d$\\ses в вашей папке " + ver.replace(folderReg,'_') + ". <br> На стенде тоже папку любую или " + ver + "."
+  createFolder.innerHTML = "Необходимо создать папки <br> На локальной машине как вам удобно или " + ver + ".<br> На dev по пути \\10.125.8.59\\d$\\ses в вашей папке " + ver.replace(folderReg,'_') + ". <br> На стенде по пути \\172.19.2.12\c$\PRFL с именем " + ver + "."
   //Экспорт репозитория
   let exportRep = document.createElement('li');
   if(fullRRFlg) {
@@ -89,7 +89,11 @@ function createList() {
   dateSQLMain.innerHTML = "Сборка постоянных скриптов: <br>Release - указываем тут какой патч/релиз устанавливается<br>MANIFESTS - отключаем ненужные манифесты(очень аккуратно, иногда это необходимо делать поименно)"
   //Экспорт PKG
   let datePKG = document.createElement('li');
-  let pkgFlag = "N";
+  let datePKGFlag = "N";
+
+  //Экспорт JMS
+  let dateJMS = document.createElement('li');
+  let dateJMSFlag = "N";
   function createUpdateRTE(list, regexp) { 
     let a = '';
     for (let i = 0; i < list.length; i++) {
@@ -116,7 +120,8 @@ function createList() {
         this.dateOutsqlScr_f = ""; //экспорт sql скриптов
         this.dateOutFile_f = ""; //экспорт файлов
         this.dateOutPKG_f = ""; //экспорт пакетов
-        this.fildBase = ""
+        this.fildBase = ""; //поле для поиска
+        this.dateJMS = ""; //экспорт JMS профилей
 
     };
     let listSQL = "'" + list.join("','") + "'"
@@ -216,12 +221,12 @@ function createList() {
         break;
       case 'Data Map':
       case 'DTU': 
-      objOut.name = "ADM"
-      objOut.admName = "DataMapObject"
-      objOut.seachSpec = "[ATC Release]='" + ver + "'"
-      objOut.wayOp = "Синхронизация/Synchronize"
-      objOut.tableOb = "S_BUSOBJ_DMAP";
-      objOut.fildBase = "NAME";
+        objOut.name = "ADM"
+        objOut.admName = "DataMapObject"
+        objOut.seachSpec = "[ATC Release]='" + ver + "'"
+        objOut.wayOp = "Синхронизация/Synchronize"
+        objOut.tableOb = "S_BUSOBJ_DMAP";
+        objOut.fildBase = "NAME";
         break;
       case 'Log Conf.':
         objOut.name = "ADM"
@@ -332,8 +337,12 @@ function createList() {
       case 'HTML':
       case 'CSS':
         objOut.dateOutFile_f = 'Необходимо все файлы добавить в патч в папку \\server , сохраняя при этом путь (пример server\\ses\\applicationcontainer_external\\siebelwebroot\\scripts\\siebel)'
+        break;
       case 'PKG':
         objOut.dateOutPKG_f = 'Необходимо добавить файл PKG в папку \\db'
+        break;
+      case 'JMS Profile':
+        objOut.dateJMS  = 'Добавить скрипты в папку \\srvmgr'
       }
     if(objOut.tableOb){
         objOut.sql_f = "--" + obj + "<br><mark><code> update siebel." + objOut.tableOb + " a set a." + objOut.fildRel + " = '" + ver + "' where a." + objOut.fildBase + " in (" + listSQL + ")"//");<br> commit;</mark></code><br>"
@@ -427,16 +436,20 @@ function createList() {
   //тут надо будет последовательность делать
   ol.prepend()
   ol.prepend(exportRep)
-  if(pkgFlag == "Y"){ol.prepend(datePKG)}
+  if(datePKGFlag == "Y"){ol.prepend(datePKG)}
   if(sqlScrFlag == "Y"){ol.prepend(dateSQLScr)}
   if(fileFlag == "Y"){ol.prepend(dateOutFile)}
   if(confFlag == "Y"){ol.prepend(dateOutConf)}
   if(DVFlag == "Y"){ol.prepend(dateOutDV)}
   if(prFlag == "Y"){ol.prepend(dateOutPr)}
   if(sqlFlag == "Y"){ol.prepend(sql)}
-  ol.prepend(exportShem)
+  if(!fullRRFlg){ol.prepend(exportShem)}
   ol.prepend(createFolder)
   
   document.getElementById('renderListOfObj').appendChild(div);
   
+}
+
+function createManual(){
+  console.log("А")
 }
