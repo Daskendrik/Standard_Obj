@@ -523,7 +523,7 @@ function createDate(type){
     document.getElementById('renderToStend').appendChild(manu_fil);
     manu_fil.prepend()
     for (const key in maunu_obj) {
-      manu_fil.prepend(key)
+      manu_fil.prepend(maunu_obj[key])
     }
   }
   
