@@ -29,19 +29,46 @@ function createWaterMark(){
 function createDate(type){
   //Общие переменные
   let fullRRFlg = document.getElementById('fullRRFlg').checked    //Фул репозиторий? 
-  let  ver = document.getElementById('ver').value;                //Версия патча/релиза
-  let  int = document.getElementById('int').value;                //Текущий инт
-  let  div = document.querySelector('div')                        //див
+  let ver = document.getElementById('ver').value;                 //Версия патча/релиза
+  let int = document.getElementById('int').value;                 //Текущий инт
+  let div = document.querySelector('div')                         //див
   let ol = document.querySelector('ol')                           //нумированый список
+  let div_fil = document.querySelector('div') 
+  let manu_fil = document.querySelector('ol')                     //инструкция по сборке для филит
   let listOftd = null;                                            //
-  let listName = []; //список объектов
-  let sNameOb = null; //Название объекта
-  let sName = null; //Именование объектов
+  let listName = [];                                              //список объектов
+  let sNameOb = null;                                             //Название объекта
+  let sName = null;                                               //Именование объектов
+  let repFileName = document.getElementById('repFileName').value; //название файла репозитория
+  let DDLFileName = document.getElementById('DDLFileName').value; //название файла схемы
   //удаляем при повторном нажатии прошлое
   if(div) {div.remove()};
     div = document.createElement('div');
   if(ol) {ol.remove()};
+  if(manu_fil) {manu_fil.remove()}
+  let listOftr = Array.from(document.getElementById('tObj').querySelectorAll('tr'))
+  listOftr = listOftr.slice(1)
+  ol = document.createElement('ol');
+  ol.setAttribute('id','proList');
 
+  for (let i = 0; i < listOftr.length; i++) { // 
+    let element = listOftr[i];
+    listOftd = Array.from(element.querySelectorAll('td'))
+    sNameOb = listOftd[0].querySelectorAll('input')[0].value
+    if (!sNameOb) continue;
+    div.innerHTML += "<b> " + sNameOb + "</b>"
+    sName = listOftd[1].querySelectorAll('textarea')[0].value
+    sName = sName.split(',')
+    let regexp = /^\s+|\s+$/g
+    sName = sName.map(item=>item.replace(regexp,""))
+    console.log(sName)
+    listName = [];
+    for (let j = 0; j < sName.length; j++) { // Тут название самих объектов
+      const element = sName[j];
+      div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
+      listName.push(element);
+    }
+  }
   function createListBuild() {
     //Для инструкций
     let arr = []; //данные из функции
@@ -57,8 +84,8 @@ function createDate(type){
     let dateOutConf = document.createElement('li');
     let confFlag = "N";
     //EFS доп
-    let dateOutEFS = document.createElement('li');
-    let EFSFlag = "N"
+    // let dateOutEFS = document.createElement('li');
+    // let EFSFlag = "N"
     //Экспорт sql скриптов
     let dateSQLScr = document.createElement('li');
     let sqlScrFlag = "N";
@@ -341,7 +368,7 @@ function createDate(type){
           objOut.dateOutPKG_f = 'Необходимо добавить файл PKG в папку \\db'
           break;
         case 'JMS Profile':
-          objOut.dateJMS  = 'Добавить скрипты в папку \\srvmgr'
+          objOut.dateJMS  = 'Добавить JMS-скрипты в папку \\srvmgr'
         }
       if(objOut.tableOb){
           objOut.sql_f = "--" + obj + "<br><mark><code> update siebel." + objOut.tableOb + " a set a." + objOut.fildRel + " = '" + ver + "' where a." + objOut.fildBase + " in (" + listSQL + ")"//");<br> commit;</mark></code><br>"
@@ -370,10 +397,7 @@ function createDate(type){
     sql.innerHTML = "Прогнать на DEV следующие апдейты: <br>"
     dateOutPr.innerHTML = "Зайти на страницу Проекты для внедрения, создать проект с именем " + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
   
-    let listOftr = Array.from(document.getElementById('tObj').querySelectorAll('tr'))
-    listOftr = listOftr.slice(1)
-    ol = document.createElement('ol');
-    ol.setAttribute('id','proList');
+
     document.getElementById('renderList').appendChild(ol);
     for (let i = 0; i < listOftr.length; i++) { // 
       let element = listOftr[i];
@@ -394,7 +418,10 @@ function createDate(type){
       }
       arr = createListOfNoRepOut(sNameOb, listName, ver, int, regexp);
       console.log(arr)
-      
+      if(arr.dateJMS != ""){
+        dateJMS.innerHTML = dateJMS.innerHTML + arr.dateJMS;
+        dateJMSFlag = "Y"
+      }
       if(arr.sql_f != "") {
         sql.innerHTML = sql.innerHTML + arr.sql_f
         sqlFlag = "Y"
@@ -432,6 +459,7 @@ function createDate(type){
     ol.prepend(exportRep)
     if(datePKGFlag == "Y"){ol.prepend(datePKG)}
     if(sqlScrFlag == "Y"){ol.prepend(dateSQLScr)}
+    if(dateJMSFlag == "Y"){ol.prepend(dateJMS)}
     if(fileFlag == "Y"){ol.prepend(dateOutFile)}
     if(confFlag == "Y"){ol.prepend(dateOutConf)}
     if(DVFlag == "Y"){ol.prepend(dateOutDV)}
@@ -443,15 +471,69 @@ function createDate(type){
     document.getElementById('renderListOfObj').appendChild(div);
     
   }
+
+  function createManual(){
+    console.log('createManual')
+    let maunu_obj = {
+      repFileFIL:""
+    }
+    //переменные для инструкции установки от филит
+    maunu_obj.repFileFIL = document.createElement('li');
+    maunu_obj.repFileFIL.innerHTML = " C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p SADMIN /l C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".log /f C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c SBLTST_DSN"
+    let DDLFileFIL = document.createElement('li');
+    DDLFileFIL.innerHTML = "Выполнить последовательно команды в cmd консоли с правами администратора: <br>      Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql"
+    //переменные для инструкции банка
+    let repFileBNK = document.createElement('li');
+    repFileBNK.innerHTML = "Выполнить последовательно команды в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p <Пароль SADMIN> /l <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".log /f <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c <Актуальный ODBC стенда>"
+    let DDLFileBNK = document.createElement('li');
+    DDLFileBNK.innerHTML = "Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql"
+    //общие перменные 
+    let stepScheme = document.createElement('li');
+    stepScheme.innerHTML = "По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql"
+    let stepSercFile = document.createElement('li');
+    stepSercFile.innerHTML = "Произвести замену файлов сервера на файлы из папки поставки /server/ (пути до файлов внутри корневой папки соответствуют путям на сервере)"
+    let stepManifest = document.createElement('li');
+    stepManifest.innerHTML = "Выполнить скрипт в схеме SIEBEL из папки поставки /db/MANIFESTS.sql"
+    let stepTask = document.createElement('li');
+    stepTask.innerHTML = "Выполнить скрипт в схеме SIEBEL /db/TASKS.sql"
+    let stepADMFile = document.createElement('li');
+    stepADMFile.innerHTML = "Скопировать содержимое папки поставки /ADM/ в папку на сервере C:/ADM/"
+    let stepADMRun = document.createElement('li');
+    stepADMRun.innerHTML = "Выполнить импорт АДМ через srvmgr. Выполнить команды:<br>           run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<br>           После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!"
+    let stepDV = document.createElement('li');
+    stepDV.innerHTML = "Произвести импорт правил Data Validation из папки поставки /DV/. После чего активизировать импортированные Data Validation"
+    let stepSIEBEL = document.createElement('li');
+    stepSIEBEL.innerHTML = "Выполнить скрипт в схеме SIEBEL из папки поставки /db/SIEBEL.sql"
+    let stepTaskActive = document.createElement('li');
+    stepTaskActive.innerHTML = "В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и :"
+    let stepTrig = document.createElement('li');
+    stepTrig.innerHTML = "Выполнить перегенерацию триггеров через srvmgr:<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=True,PrivUser=SIEBEL,PrivUserPass=SIEBEL<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=False,PrivUser=SIEBEL,PrivUserPass=SIEBEL"
+    let stepCash = document.createElement('li');
+    stepCash.innerHTML = "В приложении FINS перейти на экран"
+    let stepRelease = document.createElement('li');
+    stepRelease.innerHTML = "Выполнить Release.sql папки поставки /db/ в схеме SIEBEL"
+    let stepDiccache = document.createElement('li');
+    stepDiccache.innerHTML = "Удалить файл diccache.dat в папке C:\\ses\\siebsrvr\\BIN"
+    let stepEAI = document.createElement('li');
+    stepEAI.innerHTML = "Перезапустить EAI компоненту на всех Siebel App";
+
+    
+    manu_fil = document.createElement('ol');
+    ol.setAttribute('id','manuFilList');
+    document.getElementById('renderToStend').appendChild(manu_fil);
+    manu_fil.prepend()
+    for (const key in maunu_obj) {
+      manu_fil.prepend(key)
+    }
+  }
+  
   switch(type)
   {
     case 'Build':
       createListBuild()
       break;
+    case 'Manual':
+      createManual()
+      break;
   }
-}
-
-
-function createManual(){
-  console.log(listOftr)
 }
