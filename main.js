@@ -35,12 +35,41 @@ function createDate(type){
   let ol = document.querySelector('ol')                           //нумированый список
   let div_fil = document.querySelector('div') 
   let manu_fil = document.querySelector('ol')                     //инструкция по сборке для филит
+  let manu_bank =  document.querySelector('ol')                   //инструкция по сборке для банка
   let listOftd = null;                                            //
   let listName = [];                                              //список объектов
   let sNameOb = null;                                             //Название объекта
   let sName = null;                                               //Именование объектов
   let repFileName = document.getElementById('repFileName').value; //название файла репозитория
   let DDLFileName = document.getElementById('DDLFileName').value; //название файла схемы
+  let tasks = [];
+  let DV = [];
+  //Для инструкций
+  let arr = []; //данные из функции
+  //Нерепозиторка АДМ
+  let sql = document.createElement('li'); //sql для апдейта нерепозиторных
+  let sqlFlag = "N";
+  let dateOutPr = document.createElement('li'); //добавление в проект внедрения
+  let prFlag = "N";
+  //DV доп
+  let dateOutDV = document.createElement('li'); //экспорт DV
+  let DVFlag = "N";
+  //Конфигцрация телефонии  доп
+  let dateOutConf = document.createElement('li');
+  let confFlag = "N";
+  //EFS доп
+  // let dateOutEFS = document.createElement('li');
+  // let EFSFlag = "N"
+  //Экспорт sql скриптов
+  let dateSQLScr = document.createElement('li');
+  let sqlScrFlag = "N";
+  //Экспорт файлов
+  let dateOutFile = document.createElement('li');
+  let fileFlag = "N";
+  //Создание папок
+  let createFolder = document.createElement('li');
+  let folderReg = /\./g
+  
   //удаляем при повторном нажатии прошлое
   if(div) {div.remove()};
     div = document.createElement('div');
@@ -51,50 +80,32 @@ function createDate(type){
   ol = document.createElement('ol');
   ol.setAttribute('id','proList');
 
-  for (let i = 0; i < listOftr.length; i++) { // 
-    let element = listOftr[i];
-    listOftd = Array.from(element.querySelectorAll('td'))
-    sNameOb = listOftd[0].querySelectorAll('input')[0].value
-    if (!sNameOb) continue;
-    div.innerHTML += "<b> " + sNameOb + "</b>"
-    sName = listOftd[1].querySelectorAll('textarea')[0].value
-    sName = sName.split(',')
-    let regexp = /^\s+|\s+$/g
-    sName = sName.map(item=>item.replace(regexp,""))
-    console.log(sName)
-    listName = [];
-    for (let j = 0; j < sName.length; j++) { // Тут название самих объектов
-      const element = sName[j];
-      div.innerHTML += "<li style = 'margin-left: 40px;'>" + element + "</li>"
-      listName.push(element);
-    }
-  }
   function createListBuild() {
-    //Для инструкций
-    let arr = []; //данные из функции
-    //Нерепозиторка АДМ
-    let sql = document.createElement('li'); //sql для апдейта нерепозиторных
-    let sqlFlag = "N";
-    let dateOutPr = document.createElement('li'); //добавление в проект внедрения
-    let prFlag = "N";
-    //DV доп
-    let dateOutDV = document.createElement('li'); //экспорт DV
-    let DVFlag = "N";
-    //Конфигцрация телефонии  доп
-    let dateOutConf = document.createElement('li');
-    let confFlag = "N";
-    //EFS доп
-    // let dateOutEFS = document.createElement('li');
-    // let EFSFlag = "N"
-    //Экспорт sql скриптов
-    let dateSQLScr = document.createElement('li');
-    let sqlScrFlag = "N";
-    //Экспорт файлов
-    let dateOutFile = document.createElement('li');
-    let fileFlag = "N";
-    //Создание папок
-    let createFolder = document.createElement('li');
-    let folderReg = /\./g
+    // //Для инструкций
+    // let arr = []; //данные из функции
+    // //Нерепозиторка АДМ
+    // let sql = document.createElement('li'); //sql для апдейта нерепозиторных
+    // let sqlFlag = "N";
+    // let dateOutPr = document.createElement('li'); //добавление в проект внедрения
+    // let prFlag = "N";
+    // //DV доп
+    // let dateOutDV = document.createElement('li'); //экспорт DV
+    // let DVFlag = "N";
+    // //Конфигцрация телефонии  доп
+    // let dateOutConf = document.createElement('li');
+    // let confFlag = "N";
+    // //EFS доп
+    // // let dateOutEFS = document.createElement('li');
+    // // let EFSFlag = "N"
+    // //Экспорт sql скриптов
+    // let dateSQLScr = document.createElement('li');
+    // let sqlScrFlag = "N";
+    // //Экспорт файлов
+    // let dateOutFile = document.createElement('li');
+    // let fileFlag = "N";
+    // //Создание папок
+    // let createFolder = document.createElement('li');
+    // let folderReg = /\./g
     createFolder.innerHTML = "Необходимо создать папки <br> На локальной машине как вам удобно или " + ver + ".<br> На dev по пути \\10.125.8.59\\d$\\ses в вашей папке " + ver.replace(folderReg,'_') + ". <br> На стенде по пути \\172.19.2.12\c$\PRFL с именем " + ver + "."
     //Экспорт репозитория
     let exportRep = document.createElement('li');
@@ -344,6 +355,7 @@ function createDate(type){
           break;
         case 'DV': 
           objOut.dateOutDV_f = "<b>DV</b><br>Зайти на экран Наборы правил. Сделать поиск, где Имя <mark><code>" + listOr + ",</mark></code> а Статус - <b>Активно</b>. Необходимо проверить, что нет пересечений с новым релизом. Шестеренка - > экспорт. Полученный файл переместить в папку DV"
+          DV = list;
           break;
         case 'Конфигурация телефонии':
           objOut.dateOutConf_f = "Зайти на страницу <b>АДМ – коммуникации, Конфигурации</b>. Найти конфигурацию по имени <mark><code>" + listOr + "</mark></code>. Шестеренка - > экспорт. При экспорте выбираем первые 3 параметра (Параметры конфигурации, Команды, События). Полученный файл переместить в папку Конфигурация"
@@ -475,55 +487,72 @@ function createDate(type){
   function createManual(){
     console.log('createManual')
     let maunu_obj = {
-      repFileFIL:""
-    }
-    //переменные для инструкции установки от филит
-    maunu_obj.repFileFIL = document.createElement('li');
-    maunu_obj.repFileFIL.innerHTML = " C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p SADMIN /l C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".log /f C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c SBLTST_DSN"
-    let DDLFileFIL = document.createElement('li');
-    DDLFileFIL.innerHTML = "Выполнить последовательно команды в cmd консоли с правами администратора: <br>      Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql"
-    //переменные для инструкции банка
-    let repFileBNK = document.createElement('li');
-    repFileBNK.innerHTML = "Выполнить последовательно команды в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p <Пароль SADMIN> /l <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".log /f <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c <Актуальный ODBC стенда>"
-    let DDLFileBNK = document.createElement('li');
-    DDLFileBNK.innerHTML = "Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql"
-    //общие перменные 
-    let stepScheme = document.createElement('li');
-    stepScheme.innerHTML = "По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql"
-    let stepSercFile = document.createElement('li');
-    stepSercFile.innerHTML = "Произвести замену файлов сервера на файлы из папки поставки /server/ (пути до файлов внутри корневой папки соответствуют путям на сервере)"
-    let stepManifest = document.createElement('li');
-    stepManifest.innerHTML = "Выполнить скрипт в схеме SIEBEL из папки поставки /db/MANIFESTS.sql"
-    let stepTask = document.createElement('li');
-    stepTask.innerHTML = "Выполнить скрипт в схеме SIEBEL /db/TASKS.sql"
-    let stepADMFile = document.createElement('li');
-    stepADMFile.innerHTML = "Скопировать содержимое папки поставки /ADM/ в папку на сервере C:/ADM/"
-    let stepADMRun = document.createElement('li');
-    stepADMRun.innerHTML = "Выполнить импорт АДМ через srvmgr. Выполнить команды:<br>           run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<br>           После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!"
-    let stepDV = document.createElement('li');
-    stepDV.innerHTML = "Произвести импорт правил Data Validation из папки поставки /DV/. После чего активизировать импортированные Data Validation"
-    let stepSIEBEL = document.createElement('li');
-    stepSIEBEL.innerHTML = "Выполнить скрипт в схеме SIEBEL из папки поставки /db/SIEBEL.sql"
-    let stepTaskActive = document.createElement('li');
-    stepTaskActive.innerHTML = "В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и :"
-    let stepTrig = document.createElement('li');
-    stepTrig.innerHTML = "Выполнить перегенерацию триггеров через srvmgr:<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=True,PrivUser=SIEBEL,PrivUserPass=SIEBEL<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=False,PrivUser=SIEBEL,PrivUserPass=SIEBEL"
-    let stepCash = document.createElement('li');
-    stepCash.innerHTML = "В приложении FINS перейти на экран"
-    let stepRelease = document.createElement('li');
-    stepRelease.innerHTML = "Выполнить Release.sql папки поставки /db/ в схеме SIEBEL"
-    let stepDiccache = document.createElement('li');
-    stepDiccache.innerHTML = "Удалить файл diccache.dat в папке C:\\ses\\siebsrvr\\BIN"
-    let stepEAI = document.createElement('li');
-    stepEAI.innerHTML = "Перезапустить EAI компоненту на всех Siebel App";
+      stepEAI:"Перезапустить EAI компоненту на всех Siebel App",
+      stepDiccache:"Удалить файл diccache.dat в папке C:\\ses\\siebsrvr\\BIN",
+      stepRelease:"Выполнить Release.sql папки поставки /db/ в схеме SIEBEL",
+      stepCash:"В приложении FINS перейти на экран",
+      stepTrig:"Выполнить перегенерацию триггеров через srvmgr:<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=True,PrivUser=SIEBEL,PrivUserPass=SIEBEL<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=False,PrivUser=SIEBEL,PrivUserPass=SIEBEL",
+      stepTaskActive:"В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и :",
+      stepSIEBEL:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/SIEBEL.sql",
+      stepDV:"Произвести импорт правил Data Validation из папки поставки /DV/. После чего активизировать импортированные Data Validation",
+      stepADMRun:"Выполнить импорт АДМ через srvmgr. Выполнить команды:<br>           run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<br>           После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!",
+      stepADMFile:"Скопировать содержимое папки поставки /ADM/ в папку на сервере C:/ADM/", 
+      stepTask:"Выполнить скрипт в схеме SIEBEL /db/TASKS.sql",
+      stepManifest:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/MANIFESTS.sql",
+      stepSercFile:"Произвести замену файлов сервера на файлы из папки поставки /server/ (пути до файлов внутри корневой папки соответствуют путям на сервере)",
+      stepScheme:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      DDLFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
+      repFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
+      DDLFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
+      repFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
 
-    
+
+      // repFileFIL:"Выполнить последовательно команды в cmd консоли с правами администратора: <br>      Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      // DDLFileFIL:"Выполнить последовательно команды в cmd консоли с правами администратора: <br>      Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      // repFileBNK:"Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      // DDLFileBNK:"Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      // stepScheme:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      // stepSercFile:"Произвести замену файлов сервера на файлы из папки поставки /server/ (пути до файлов внутри корневой папки соответствуют путям на сервере)",
+      // stepManifest:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/MANIFESTS.sql",
+      // stepTask:"Выполнить скрипт в схеме SIEBEL /db/TASKS.sql",
+      // stepADMFile:"Скопировать содержимое папки поставки /ADM/ в папку на сервере C:/ADM/",
+      // stepADMRun:"Выполнить импорт АДМ через srvmgr. Выполнить команды:<br>           run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<br>           После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!",
+      // stepDV:"Произвести импорт правил Data Validation из папки поставки /DV/. После чего активизировать импортированные Data Validation",
+      // stepSIEBEL:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/SIEBEL.sql",
+      // stepTaskActive:"В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и :",
+      // stepTrig:"Выполнить перегенерацию триггеров через srvmgr:<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=True,PrivUser=SIEBEL,PrivUserPass=SIEBEL<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=False,PrivUser=SIEBEL,PrivUserPass=SIEBEL",
+      // stepCash:"В приложении FINS перейти на экран",
+      // stepRelease:"Выполнить Release.sql папки поставки /db/ в схеме SIEBEL",
+      // stepDiccache:"Удалить файл diccache.dat в папке C:\\ses\\siebsrvr\\BIN",
+      // stepEAI:"Перезапустить EAI компоненту на всех Siebel App"
+    }
+    //обработка объектов
+
+
+
+
+
+
+    //отрисовка 
+    manu_bank = document.createElement('ol');
     manu_fil = document.createElement('ol');
-    ol.setAttribute('id','manuFilList');
     document.getElementById('renderToStend').appendChild(manu_fil);
+    document.getElementById('renderForBank').appendChild(manu_bank);
+    manu_bank.prepend()
     manu_fil.prepend()
     for (const key in maunu_obj) {
-      manu_fil.prepend(maunu_obj[key])
+      let a = document.createElement('li')
+      if(key!='repFileBNK' && key!='DDLFileBNK'){
+        a.innerHTML = maunu_obj[key]
+      manu_fil.prepend(a)
+      };
+    }
+    for (const key in maunu_obj) {
+      let a = document.createElement('li')
+      if(key!='DDLFileFIL' && key!='repFileFIL'){
+        a.innerHTML = maunu_obj[key]
+        manu_bank.prepend(a)
+      };
     }
   }
   
@@ -536,4 +565,5 @@ function createDate(type){
       createManual()
       break;
   }
+  console.log(DV)
 }
