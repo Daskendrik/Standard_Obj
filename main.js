@@ -8,7 +8,62 @@ function addRow(tableID){
     let td3 = newRow.insertCell(2);
     td1.innerHTML = `<input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Начните вводить именование объекта" style="width: 400px;">
             <datalist id="datalistOptions">
-              <option value='Navigation Links'><option value='JMS Profile'><option value='Pers.Applets'><option value='DTU'><option value='Data Map'><option value='PKG'><option value='Pers.Rules'><option value='Pers.Views'><option value='RTE'><option value='Pers.Actions'><option value='DVM'><option value='EAI Lookup Map'><option value='EAI Data Map'><option value='Comm Pkg'><option value=' Inb.WS'><option value='Out.WS'><option value='DataMap'><option value='Log Conf.'><option value='Audit Trail'><option value='Wf Action Type'><option value='Wf Policy'><option value='View'><option value='Responsibility'><option value='SysPref'><option value='PDQ'><option value='LOV'><option value='LOV Constant'><option value='ATC EFS'><option value='EFS Profile'><option value='Конфигурация телефонии'><option value='DV'><option value='SmartScript'><option value='Task Resp.'><option value='Link'><option value='BC'><option value='WF'><option value='IO'><option value='Applet'><option value='BO'><option value='Screen'><option value='Pick List'><option value='SS'><option value='Web Template'><option value='BS'><option value='Icon Map'><option value='View'><option value='Bitmap Category'><option value='Task'><option value='Table'><option value='WFP Column'><option value='WFP Program'><option value='WFP Object'><option value='JS'><option value='CSS'><option value='HTML'><option value='images'><option value='srvmgr'><option value='sql'>
+            <option value='JMS Profile'>
+            <option value='Data Map'>
+            <option value='Pers.Applets'>
+            <option value='Pers.Rules'>
+            <option value='Pers.Views'>
+            <option value='RTE'>
+            <option value='Pers.Actions'>
+            <option value='DVM'>
+            <option value='EAI Lookup Map'>
+            <option value='EAI Data Map'>
+            <option value='Navigation Links'>
+            <option value='Comm Pkg'>
+            <option value='Inb.WS'>
+            <option value='Out.WS'>
+            <option value='DataMap'>
+            <option value='Log Conf.'>
+            <option value='Audit Trail'>
+            <option value='Wf Action Type'>
+            <option value='Wf Policy'>
+            <option value='АДМ - представление'>
+            <option value='Responsibility'>
+            <option value='SysPref'>
+            <option value='PDQ'>
+            <option value='LOV'>
+            <option value='LOV Constant'>
+            <option value='ATC EFS'>
+            <option value='EFS Profile'>
+            <option value='Конфигурация телефонии'>
+            <option value='DV'>
+            <option value='SmartScript'>
+            <option value='Task Resp.'>
+            <option value='Link'>
+            <option value='BC'>
+            <option value='WF'>
+            <option value='IO'>
+            <option value='Applet'>
+            <option value='BO'>
+            <option value='Screen'>
+            <option value='Pick List'>
+            <option value='SS'>
+            <option value='Web Template'>
+            <option value='BS'>
+            <option value='Icon Map'>
+            <option value='View'>
+            <option value='Bitmap Category'>
+            <option value='Task'>
+            <option value='Table'>
+            <option value='WFP Column'>
+            <option value='WFP Program'>
+            <option value='WFP Object'>
+            <option value='JS'>
+            <option value='CSS'>
+            <option value='HTML'>
+            <option value='images'>
+            <option value='srvmgr'>
+            <option value='sql'>
             </datalist>`
     td2.innerHTML = `<textarea class="form-control" aria-label="С текстовым полем"  placeholder="Введите названия объектов через запятую" style="width: 1000px;">`
     td3.innerHTML = `<button id = '`+indexRow+`'type="button" class="btn btn-dark" onclick = deleteRowIndex(this.id)>Удалить строку</button>`
@@ -32,10 +87,9 @@ function createDate(type){
   let ver = document.getElementById('ver').value;                 //Версия патча/релиза
   let int = document.getElementById('int').value;                 //Текущий инт
   let div = document.querySelector('div')                         //див
-  let ol = document.querySelector('ol')                           //нумированый список
-  let div_fil = document.querySelector('div') 
-  let manu_fil = document.querySelector('ol')                     //инструкция по сборке для филит
-  let manu_bank =  document.querySelector('ol')                   //инструкция по сборке для банка
+  let ol = document.getElementById('proList')                           //нумированый список
+  let manu_fil = document.getElementById('manu_fil')                     //инструкция по сборке для филит
+  let manu_bank =  document.getElementById('manu_bank')                   //инструкция по сборке для банка
   let listOftd = null;                                            //
   let listName = [];                                              //список объектов
   let sNameOb = null;                                             //Название объекта
@@ -44,6 +98,13 @@ function createDate(type){
   let DDLFileName = document.getElementById('DDLFileName').value; //название файла схемы
   let tasks = [];
   let DV = [];
+  let serverFlg = 'N';
+  let ADMFlg = 'N';
+  let trigFlg = 'N';
+  let cashApp = 'N';
+  let cashMap = 'N';
+  let cashLov = 'N';
+  let cashEvent = 'N';
   //Для инструкций
   let arr = []; //данные из функции
   //Нерепозиторка АДМ
@@ -70,42 +131,15 @@ function createDate(type){
   let createFolder = document.createElement('li');
   let folderReg = /\./g
   
-  //удаляем при повторном нажатии прошлое
-  if(div) {div.remove()};
-    div = document.createElement('div');
-  if(ol) {ol.remove()};
-  if(manu_fil) {manu_fil.remove()}
   let listOftr = Array.from(document.getElementById('tObj').querySelectorAll('tr'))
   listOftr = listOftr.slice(1)
-  ol = document.createElement('ol');
-  ol.setAttribute('id','proList');
 
   function createListBuild() {
-    // //Для инструкций
-    // let arr = []; //данные из функции
-    // //Нерепозиторка АДМ
-    // let sql = document.createElement('li'); //sql для апдейта нерепозиторных
-    // let sqlFlag = "N";
-    // let dateOutPr = document.createElement('li'); //добавление в проект внедрения
-    // let prFlag = "N";
-    // //DV доп
-    // let dateOutDV = document.createElement('li'); //экспорт DV
-    // let DVFlag = "N";
-    // //Конфигцрация телефонии  доп
-    // let dateOutConf = document.createElement('li');
-    // let confFlag = "N";
-    // //EFS доп
-    // // let dateOutEFS = document.createElement('li');
-    // // let EFSFlag = "N"
-    // //Экспорт sql скриптов
-    // let dateSQLScr = document.createElement('li');
-    // let sqlScrFlag = "N";
-    // //Экспорт файлов
-    // let dateOutFile = document.createElement('li');
-    // let fileFlag = "N";
-    // //Создание папок
-    // let createFolder = document.createElement('li');
-    // let folderReg = /\./g
+    if(div) {div.remove()};
+    div = document.createElement('div');
+    if(ol) {ol.remove()};
+    ol = document.createElement('ol');
+    ol.setAttribute('id','proList');
     createFolder.innerHTML = "Необходимо создать папки <br> На локальной машине как вам удобно или " + ver + ".<br> На dev по пути \\10.125.8.59\\d$\\ses в вашей папке " + ver.replace(folderReg,'_') + ". <br> На стенде по пути \\172.19.2.12\c$\PRFL с именем " + ver + "."
     //Экспорт репозитория
     let exportRep = document.createElement('li');
@@ -137,7 +171,7 @@ function createDate(type){
         let element = list[i];
         element = element.split("-");
         element = element.map(item=>item.replace(regexp,""))
-        a += "<mark><code>update siebel.S_CT_EVENT a set a.X_RELEASE = '47.0.5' where a.OBJ_TYPE_CD = '" + element[0] + "' AND a.OBJ_NAME = '" + element[1] + "' AND a.EVT_SUB_NAME = '" + element[2] + "' AND a.EVT_NAME = '" + element[3] + "';<br>commit;</mark></code><br>"   
+        a += "<mark><code>update siebel.S_CT_EVENT a set a.X_RELEASE = '" + ver + "' where a.OBJ_TYPE_CD = '" + element[0] + "' AND a.OBJ_NAME = '" + element[1] + "' AND a.EVT_SUB_NAME = '" + element[2] + "' AND a.EVT_NAME = '" + element[3] + "';<br>commit;</mark></code><br>"   
       }
       return a;
     }
@@ -379,6 +413,8 @@ function createDate(type){
         case 'PKG':
           objOut.dateOutPKG_f = 'Необходимо добавить файл PKG в папку \\db'
           break;
+        case 'Task':
+          tasks = list;
         case 'JMS Profile':
           objOut.dateJMS  = 'Добавить JMS-скрипты в папку \\srvmgr'
         }
@@ -408,7 +444,8 @@ function createDate(type){
     }
     sql.innerHTML = "Прогнать на DEV следующие апдейты: <br>"
     dateOutPr.innerHTML = "Зайти на страницу Проекты для внедрения, создать проект с именем " + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
-  
+    let disRep = document.createElement('li');
+    disRep.innerHTML = "<b>Дизайн после санити</b><p>После того, как санити будет успешным, необходимо на локальной машине в cmd прогнать скрипт:<br><mark><code> C:\\Tools_2\\BIN\\dataexp /u SADMIN /p SADMIN /c \"SSD default instance\" /d SIEBEL /f C:\\Tools_2\\BIN\\Lov" + int + ".dat /l C:\\Tools_2\\BIN\\" + int + " /w y /a IntWSName=" + int + "</mark></code><br>Из папке на деве \\\\10.125.8.59\\d$\\repos_backup забрать последний ночной бекап (большой файл).<br>Полученные 2 файла закинуть в полную сборку, в папку Full Repository(НЕ ДЛЯ ПРОДА)"
 
     document.getElementById('renderList').appendChild(ol);
     for (let i = 0; i < listOftr.length; i++) { // 
@@ -468,6 +505,7 @@ function createDate(type){
   
     //Последоватеьлность
     ol.prepend()
+    ol.prepend(disRep)
     ol.prepend(exportRep)
     if(datePKGFlag == "Y"){ol.prepend(datePKG)}
     if(sqlScrFlag == "Y"){ol.prepend(dateSQLScr)}
@@ -485,73 +523,158 @@ function createDate(type){
   }
 
   function createManual(){
+    if(manu_fil) {manu_fil.remove()}
+    if(manu_bank) {manu_bank.remove()}
     console.log('createManual')
     let maunu_obj = {
       stepEAI:"Перезапустить EAI компоненту на всех Siebel App",
       stepDiccache:"Удалить файл diccache.dat в папке C:\\ses\\siebsrvr\\BIN",
       stepRelease:"Выполнить Release.sql папки поставки /db/ в схеме SIEBEL",
       stepCash:"В приложении FINS перейти на экран",
-      stepTrig:"Выполнить перегенерацию триггеров через srvmgr:<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=True,PrivUser=SIEBEL,PrivUserPass=SIEBEL<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=False,PrivUser=SIEBEL,PrivUserPass=SIEBEL",
-      stepTaskActive:"В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и :",
+      stepTrig:"Выполнить перегенерацию триггеров через srvmgr:<p><p style=\"margin-left: 50px;\">run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=True,PrivUser=SIEBEL,PrivUserPass=SIEBEL<p><p style=\"margin-left: 50px;\">run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=False,PrivUser=SIEBEL,PrivUserPass=SIEBEL",
+      stepTaskActive:"В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и активировать:",
       stepSIEBEL:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/SIEBEL.sql",
       stepDV:"Произвести импорт правил Data Validation из папки поставки /DV/. После чего активизировать импортированные Data Validation",
-      stepADMRun:"Выполнить импорт АДМ через srvmgr. Выполнить команды:<br>           run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<br>           После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!",
+      stepADMRun:"Выполнить импорт АДМ через srvmgr. Выполнить команды:<p><p style=\"margin-left: 50px;\">run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<p><p style=\"margin-left: 50px;\">После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!",
       stepADMFile:"Скопировать содержимое папки поставки /ADM/ в папку на сервере C:/ADM/", 
       stepTask:"Выполнить скрипт в схеме SIEBEL /db/TASKS.sql",
       stepManifest:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/MANIFESTS.sql",
       stepSercFile:"Произвести замену файлов сервера на файлы из папки поставки /server/ (пути до файлов внутри корневой папки соответствуют путям на сервере)",
-      stepScheme:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
-      DDLFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
-      repFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
-      DDLFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
-      repFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql<\\p>",
-
-
-      // repFileFIL:"Выполнить последовательно команды в cmd консоли с правами администратора: <br>      Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
-      // DDLFileFIL:"Выполнить последовательно команды в cmd консоли с правами администратора: <br>      Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
-      // repFileBNK:"Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
-      // DDLFileBNK:"Выполнить команду в cmd консоли с правами администратора: <br>      C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
-      // stepScheme:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
-      // stepSercFile:"Произвести замену файлов сервера на файлы из папки поставки /server/ (пути до файлов внутри корневой папки соответствуют путям на сервере)",
-      // stepManifest:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/MANIFESTS.sql",
-      // stepTask:"Выполнить скрипт в схеме SIEBEL /db/TASKS.sql",
-      // stepADMFile:"Скопировать содержимое папки поставки /ADM/ в папку на сервере C:/ADM/",
-      // stepADMRun:"Выполнить импорт АДМ через srvmgr. Выполнить команды:<br>           run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<br>           После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!",
-      // stepDV:"Произвести импорт правил Data Validation из папки поставки /DV/. После чего активизировать импортированные Data Validation",
-      // stepSIEBEL:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/SIEBEL.sql",
-      // stepTaskActive:"В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и :",
-      // stepTrig:"Выполнить перегенерацию триггеров через srvmgr:<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=True,PrivUser=SIEBEL,PrivUserPass=SIEBEL<br>       run task for comp GenTrig server app with EXEC=True,Mode=WORK,Remove=False,PrivUser=SIEBEL,PrivUserPass=SIEBEL",
-      // stepCash:"В приложении FINS перейти на экран",
-      // stepRelease:"Выполнить Release.sql папки поставки /db/ в схеме SIEBEL",
-      // stepDiccache:"Удалить файл diccache.dat в папке C:\\ses\\siebsrvr\\BIN",
-      // stepEAI:"Перезапустить EAI компоненту на всех Siebel App"
+      repFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p <Пароль SADMIN> /l <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".log /f <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c <Актуальный ODBC стенда><p>",
+      stepSchemeBNK:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      DDLFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql<p>",
+      repFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p SADMIN /l C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".log /f C:\atc\Releases\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c SBLTST_DSN<p>",
+      stepSchemeFIL:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
+      DDLFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql<p>",
+      
     }
     //обработка объектов
+    for (let i = 0; i < listOftr.length; i++) { // 
+      let element = listOftr[i];
+      listOftd = Array.from(element.querySelectorAll('td'))
+      sNameOb = listOftd[0].querySelectorAll('input')[0].value
+      if (!sNameOb) continue;
+      sName = listOftd[1].querySelectorAll('textarea')[0].value
+      sName = sName.split(',')
+      let regexp = /^\s+|\s+$/g
+      sName = sName.map(item=>item.replace(regexp,""))
+      listName = [];
+      if(sNameOb == 'Task'){
+        tasks = sName;
+      }
+      if(sNameOb == 'DV'){
+        DV = sName
+      }
+      if(serverFlg == 'N' && (sNameOb == 'JS' || sNameOb == 'HTML' || sNameOb == 'CSS' || sNameOb == 'images')){
+        serverFlg = 'Y'
+      }
+      if(ADMFlg == 'N' && (sNameOb == 'Pers.Applets' || sNameOb == 'Pers.Rules' || sNameOb == 'Pers.Views' || sNameOb == 'Pers.Events /RTE' || sNameOb == 'Pers.Actions'  || sNameOb == 'DVM' || sNameOb == 'EAI Lookup Map' || sNameOb == 'EAI Data Map' || sNameOb == 'Comm Pkg' || sNameOb == ' Inb.WS' || sNameOb == 'Out.WS' || sNameOb == 'DTU/Data Map' || sNameOb == 'Log Conf.' || sNameOb == 'Audit Trail' || sNameOb == 'Wf Action Type' || sNameOb == 'Wf Policy' || sNameOb == 'АДМ - представление' || sNameOb == 'Responsibility' || sNameOb == 'SysPref' || sNameOb == 'PDQ' || sNameOb == 'LOV' || sNameOb == 'LOV Constant' || sNameOb == 'SmartScript' || sNameOb == 'Task Resp.')){
+        ADMFlg = 'Y'
+      }
+      if(trigFlg == 'N' && (sNameOb == 'Wf Policy' || sNameOb == 'Wf Action Type' || sNameOb == 'WFP Column' || sNameOb == 'WFP Program' || sNameOb == 'WFP Object')){
+        trigFlg = 'Y'
+      }
+      if (cashApp == 'N' && (sNameOb == 'Pers.Applets' || sNameOb == 'Pers.Rules' || sNameOb == 'Pers.Views')){
+        cashApp = 'Y'
+      }
+      if(cashMap == 'N' && (sNameOb == 'DataMap' )){
+        cashMap = 'Y'
+      }
+      if(cashLov == 'N' && (sNameOb == 'LOV' || sNameOb == 'LOV Constant')){
+        cashLov = 'Y';
+      }
+      if(cashEvent == 'N' && (sNameOb == 'RTE' || sNameOb == 'Personalization – Actions')){
+        cashEvent = 'Y';
+      }
+    }
 
 
+    if(tasks.length == 0){
+      maunu_obj.stepTask =""
+      maunu_obj.stepTaskActive = ""
+    } else {
+      for (let i = 0; i < tasks.length; i++) {
+        const element = tasks[i];
+        maunu_obj.stepTaskActive += "<p style=\"margin-left: 50px;\">* " + element
+      }
+    }
 
+    if(DV.length == 0){
+      maunu_obj.stepDV =""
+    } else {
+      for (let i = 0; i < DV.length; i++) {
+        const element = DV[i];
+        maunu_obj.stepDV += "<p style=\"margin-left: 50px;\"> * " + element
+      }
+    }
+
+    if(serverFlg == 'N'){
+      maunu_obj.stepSercFile = ""
+    }
+
+    if(ADMFlg == 'N'){
+      maunu_obj.stepADMFile = "";
+      maunu_obj.stepADMRun = "";
+    }
+
+    if(trigFlg == 'N') {
+      maunu_obj.stepTrig = ""
+    }
+
+    if(cashApp == 'Y'){
+      maunu_obj.stepCash += "<p style=\"margin-left: 50px;\">* \"Администрирование - Индивидуальная настройка -> Апплеты\" нажать на лист-апплете на шестеренку и в выпадающем списке выбрать \"Перезагрузка правил индивидуальной настройки\""
+    }
+
+    if(cashMap == 'Y'){
+      maunu_obj.stepCash += "<p style=\"margin-left: 50px;\">* \"Администрирование - приложени -> Администрирование карты данных\" произвести очистку кэша"
+    }
+
+    if(cashLov == 'Y'){
+      maunu_obj.stepCash += "<p style=\"margin-left: 50px;\">                 * \"Администрирование - данные -> Список значений\" произвести очистку кэша"
+    }
+
+    if(cashEvent == 'Y'){
+      maunu_obj.stepCash += "<p style=\"margin-left: 50px;\">* \"Администрирование - события обработки -> События\", нажать на шестеренку на апплете вверху справа и выбрать пункт \"Перезагрузка событий времени выполнения\""
+    }
+
+    if(cashApp == 'N' && cashMap == 'N' && cashLov == 'N' && cashEvent == 'N'){
+      maunu_obj.stepCash = ""
+    }
 
 
 
     //отрисовка 
-    manu_bank = document.createElement('ol');
-    manu_fil = document.createElement('ol');
+    manu_bank = document.createElement('p');
+    manu_fil = document.createElement('p');
+    manu_fil.setAttribute('id','manu_fil');
+    manu_bank.setAttribute('id','manu_bank');
     document.getElementById('renderToStend').appendChild(manu_fil);
     document.getElementById('renderForBank').appendChild(manu_bank);
     manu_bank.prepend()
     manu_fil.prepend()
+    let num = 0;
+    for (var key in maunu_obj) {
+      if(maunu_obj[key] != ""){
+        num++;
+      }
+    }
+    num = num -3;
+    let num_b = num;
     for (const key in maunu_obj) {
       let a = document.createElement('li')
-      if(key!='repFileBNK' && key!='DDLFileBNK'){
-        a.innerHTML = maunu_obj[key]
-      manu_fil.prepend(a)
+      if(key!= 'stepSchemeBNK' && key!='repFileBNK' && key!='DDLFileBNK' && maunu_obj[key] != ""){
+        a.innerHTML = num_b + ") " + maunu_obj[key]
+        manu_fil.prepend(a)
+        num_b--;
       };
     }
+    let num_a = num;
     for (const key in maunu_obj) {
       let a = document.createElement('li')
-      if(key!='DDLFileFIL' && key!='repFileFIL'){
-        a.innerHTML = maunu_obj[key]
+      if(key!= 'stepSchemeFIL' && key!='DDLFileFIL' && key!='repFileFIL' && maunu_obj[key] != ""){
+        a.innerHTML = num_a + ") " + maunu_obj[key]
         manu_bank.prepend(a)
+        num_a--;
       };
     }
   }
@@ -565,5 +688,4 @@ function createDate(type){
       createManual()
       break;
   }
-  console.log(DV)
 }
