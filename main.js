@@ -81,15 +81,33 @@ function createWaterMark(){
   console.log(markS)
   document.getElementById("markEx").value = markS;
 }
+
+function createTaskList(task){ //создаем sql апдейт тасков
+  let regVerTask = /\d{1,}/g
+  let regNameTask = /\w{1,}\s{0,}\w{0,}\s{0,}\w{0,}\s{0,}\w{0,}\s{0,}\w{0,}\s{0,}\w{0,}\(/g
+  let regexp = /^\s+|\s{1,}\(/g
+  let result = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Создать sql файл со следующим текстом: <br><mark><code>update SIEBEL.s_tu_task set status_cd='NOT_IN_USE' where status_cd='COMPLETED';<br>  commit;</mark></code><br>  -----------------------------------------------";
+  let ver = "";
+  let name = "";
+  for (let i = 0; i < task.length; i++) {
+    const element = task[i];
+    ver = element.match(regVerTask)
+    name = element.match(regNameTask)
+    name = name[0]
+    name = name.replace(regexp)
+    result += "<br><mark><code>update SIEBEL.s_tu_task set status_cd='COMPLETED' where task_name='" + name + "' and version='" + ver + "';<br>    commit;</mark></code>"
+  }
+  return result
+}
 function createDate(type){
   //Общие переменные
   let fullRRFlg = document.getElementById('fullRRFlg').checked    //Фул репозиторий? 
   let ver = document.getElementById('ver').value;                 //Версия патча/релиза
   let int = document.getElementById('int').value;                 //Текущий инт
   let div = document.querySelector('div')                         //див
-  let ol = document.getElementById('proList')                           //нумированый список
-  let manu_fil = document.getElementById('manu_fil')                     //инструкция по сборке для филит
-  let manu_bank =  document.getElementById('manu_bank')                   //инструкция по сборке для банка
+  let ol = document.getElementById('proList')                     //нумированый список
+  let manu_fil = document.getElementById('manu_fil')              //инструкция по сборке для филит
+  let manu_bank =  document.getElementById('manu_bank')           //инструкция по сборке для банка
   let listOftd = null;                                            //
   let listName = [];                                              //список объектов
   let sNameOb = null;                                             //Название объекта
@@ -140,28 +158,32 @@ function createDate(type){
     if(ol) {ol.remove()};
     ol = document.createElement('ol');
     ol.setAttribute('id','proList');
-    createFolder.innerHTML = "Необходимо создать папки <br> На локальной машине как вам удобно или " + ver + ".<br> На dev по пути \\10.125.8.59\\d$\\ses в вашей папке " + ver.replace(folderReg,'_') + ". <br> На стенде по пути \\172.19.2.12\c$\PRFL с именем " + ver + "."
+    createFolder.innerHTML = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Необходимо создать папки <br> На локальной машине как вам удобно или " + ver + ".<br> На dev по пути \\10.125.8.59\\d$\\ses в вашей папке " + ver.replace(folderReg,'_') + ". <br> На стенде по пути \\172.19.2.12\c$\PRFL с именем " + ver + "."
     //Экспорт репозитория
     let exportRep = document.createElement('li');
     if(fullRRFlg) {
-      exportRep.innerHTML = 'Для экспорта репозитория и схемы заходим в Migration под Sadmin. Далее заходим в Migration Plans, выбираем редактировать RR Full Export. В октрывшимся окне, внизу убираем галочку Application Workspace Data Service, и опять ее ставим. В открывшимся окне вбыираем нужный нам int. Далее слева заходим в Execution и нажимаем плей RR Full Export . После экспорта появится файл по пути \\10.125.8.59\\d$\\sfs\\migration\\ . Файл типо ddlexport_3A063EA767DE.ctl Сохраняем его в патче в папке scheme, а файл типо repexport_3A07919A9EF6 в папку repository'
+      exportRep.innerHTML = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Для экспорта репозитория и схемы заходим в Migration под Sadmin. Далее заходим в Migration Plans, выбираем редактировать RR Full Export. В октрывшимся окне, внизу убираем галочку Application Workspace Data Service, и опять ее ставим. В открывшимся окне вбыираем нужный нам int. Далее слева заходим в Execution и нажимаем плей RR Full Export . После экспорта появится файл по пути \\10.125.8.59\\d$\\sfs\\migration\\ . Файл типо ddlexport_3A063EA767DE.ctl Сохраняем его в патче в папке scheme, а файл типо repexport_3A07919A9EF6 в папку repository'
     } else {
-      exportRep.innerHTML = 'Для экспорта репозитория заходим на dev, в командной строке вбиваем следующую команду: <br><mark><code> D:\\ses\\siebsrvr\\BIN\\repimexp.exe /l d:\\dkolcheganova_temp_box\\Repositories\\' + ver.replace(folderReg,'_') + '\\repexport_' + ver.replace(folderReg,'_') + '.log /p SADMIN /d SIEBEL /Y "' + document.getElementById('markEx').value + '"  /r "Siebel Repository" /f d:\\dkolcheganova_temp_box\\Repositories\\'  + ver.replace(folderReg,'_') +  '\\repexport_'  + ver.replace(folderReg,'_') +  '.dat /c LETO_DEV_DSN /A O /u SADMIN </mark></code><br> Можно переименовать полученный файл, и переместить его в патч в папку repository'
+      exportRep.innerHTML = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Для экспорта репозитория заходим на dev, в командной строке вбиваем следующую команду: <br><mark><code> D:\\ses\\siebsrvr\\BIN\\repimexp.exe /l d:\\dkolcheganova_temp_box\\Repositories\\' + ver.replace(folderReg,'_') + '\\repexport_' + ver.replace(folderReg,'_') + '.log /p SADMIN /d SIEBEL /Y "' + document.getElementById('markEx').value + '"  /r "Siebel Repository" /f d:\\dkolcheganova_temp_box\\Repositories\\'  + ver.replace(folderReg,'_') +  '\\repexport_'  + ver.replace(folderReg,'_') +  '.dat /c LETO_DEV_DSN /A O /u SADMIN </mark></code><br> Можно переименовать полученный файл, и переместить его в патч в папку repository'
     }
     
     //Экспорт схемы
     let exportShem = document.createElement('li');
     if(!fullRRFlg) {
-      exportShem.innerHTML = 'Для экспорта схемы заходим в Migration под Sadmin, далее Execution и нажимаем плей Scheme Export. После экспорта появится файл по пути \\10.125.8.59\\d$\\sfs\\migration\\ . Файл типо ddlexport_3A063EA767DE.ctl Сохраняем его в патче в папке scheme'
+      exportShem.innerHTML = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Для экспорта схемы заходим в Migration под Sadmin, далее Execution и нажимаем плей Scheme Export. После экспорта появится файл по пути \\10.125.8.59\\d$\\sfs\\migration\\ . Файл типо ddlexport_3A063EA767DE.ctl Сохраняем его в патче в папке scheme'
     }
     
     //Экспорт других sql скриптов
     let dateSQLMain = document.createElement('li');
-    dateSQLMain.innerHTML = "Сборка постоянных скриптов: <br>Release - указываем тут какой патч/релиз устанавливается<br>MANIFESTS - отключаем ненужные манифесты(очень аккуратно, иногда это необходимо делать поименно)"
+    dateSQLMain.innerHTML = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Сборка постоянных скриптов: <br>Release - указываем тут какой патч/релиз устанавливается<br>MANIFESTS - отключаем ненужные манифесты(очень аккуратно, иногда это необходимо делать поименно)"
     //Экспорт PKG
     let datePKG = document.createElement('li');
     let datePKGFlag = "N";
   
+    //экспорт тасков
+    let dateTask = document.createElement('li');
+    let dateTaskFlag = "N"
+
     //Экспорт JMS
     let dateJMS = document.createElement('li');
     let dateJMSFlag = "N";
@@ -193,6 +215,7 @@ function createDate(type){
           this.dateOutPKG_f = "";       //экспорт пакетов
           this.fildBase = "";           //поле для поиска
           this.dateJMS = "";            //экспорт JMS профилей
+          this.sqlTask = "";            //написание файла для активации тасков
   
       };
       let listSQL = "'" + list.join("','") + "'"
@@ -388,11 +411,11 @@ function createDate(type){
           objOut.fildBase = "NAME"; 
           break;
         case 'DV': 
-          objOut.dateOutDV_f = "<b>DV</b><br>Зайти на экран Наборы правил. Сделать поиск, где Имя <mark><code>" + listOr + ",</mark></code> а Статус - <b>Активно</b>. Необходимо проверить, что нет пересечений с новым релизом. Шестеренка - > экспорт. Полученный файл переместить в папку DV"
+          objOut.dateOutDV_f = "<br><b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br><b>DV</b><br>Зайти на экран Наборы правил. Сделать поиск, где Имя <mark><code>" + listOr + ",</mark></code> а Статус - <b>Активно</b>. Необходимо проверить, что нет пересечений с новым релизом. Шестеренка - > экспорт. Полученный файл переместить в папку DV"
           DV = list;
           break;
         case 'Конфигурация телефонии':
-          objOut.dateOutConf_f = "Зайти на страницу <b>АДМ – коммуникации, Конфигурации</b>. Найти конфигурацию по имени <mark><code>" + listOr + "</mark></code>. Шестеренка - > экспорт. При экспорте выбираем первые 3 параметра (Параметры конфигурации, Команды, События). Полученный файл переместить в папку Конфигурация"
+          objOut.dateOutConf_f = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Зайти на страницу <b>АДМ – коммуникации, Конфигурации</b>. Найти конфигурацию по имени <mark><code>" + listOr + "</mark></code>. Шестеренка - > экспорт. При экспорте выбираем первые 3 параметра (Параметры конфигурации, Команды, События). Полученный файл переместить в папку Конфигурация"
           break;
         case 'ATC EFS':
           objOut.wayOp = 'Upsert';
@@ -402,21 +425,24 @@ function createDate(type){
           objOut.seachSpec = "[ATC EFS Profile.Code] = 'HCP' AND (" + listOr + ")"
           break;
         case 'sql':
-          objOut.dateOutsqlScr_f = 'Необходимо все скрипты sql добавить в патч в файл SIEBEL, в папку \\db , а так же к каждому коду написать номер тикета через --'
+          objOut.dateOutsqlScr_f = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Необходимо все скрипты sql добавить в патч в файл SIEBEL, в папку \\db , а так же к каждому коду написать номер тикета через --'
+          break;
         case 'JS':
         case 'images':
         case 'srvmgr':
         case 'HTML':
         case 'CSS':
-          objOut.dateOutFile_f = 'Необходимо все файлы добавить в патч в папку \\server , сохраняя при этом путь (пример server\\ses\\applicationcontainer_external\\siebelwebroot\\scripts\\siebel)'
+          objOut.dateOutFile_f = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Необходимо все файлы добавить в патч в папку \\server , сохраняя при этом путь (пример server\\ses\\applicationcontainer_external\\siebelwebroot\\scripts\\siebel)'
           break;
         case 'PKG':
-          objOut.dateOutPKG_f = 'Необходимо добавить файл PKG в папку \\db'
+          objOut.dateOutPKG_f = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Необходимо добавить файл PKG в папку \\db'
           break;
         case 'Task':
           tasks = list;
+          objOut.sqlTask =  createTaskList(list);
+          break;
         case 'JMS Profile':
-          objOut.dateJMS  = 'Добавить JMS-скрипты в папку \\srvmgr'
+          objOut.dateJMS  = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Добавить JMS-скрипты в папку \\srvmgr'
         }
       if(objOut.tableOb){
           objOut.sql_f = "--" + obj + "<br><mark><code> update siebel." + objOut.tableOb + " a set a." + objOut.fildRel + " = '" + ver + "' where a." + objOut.fildBase + " in (" + listSQL + ")"//");<br> commit;</mark></code><br>"
@@ -442,10 +468,10 @@ function createDate(type){
       //arr = [sql_f, dateOutPr_f, dateOutDV_f,dateOutConf_f,dateOutsqlScr_f,dateOutFile_f, dateOutPKG_f]
       return objOut;
     }
-    sql.innerHTML = "Прогнать на DEV следующие апдейты: <br>"
-    dateOutPr.innerHTML = "Зайти на страницу Проекты для внедрения, создать проект с именем " + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
+    sql.innerHTML = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Прогнать на DEV следующие апдейты: <br>"
+    dateOutPr.innerHTML = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Зайти на страницу Проекты для внедрения, создать проект с именем " + ver + ". Поставить флаг в колонке Экспорт в файл. <br>На нижнем апплете создать следующие записи<br>"
     let disRep = document.createElement('li');
-    disRep.innerHTML = "<b>Дизайн после санити</b><p>После того, как санити будет успешным, необходимо на локальной машине в cmd прогнать скрипт:<br><mark><code> C:\\Tools_2\\BIN\\dataexp /u SADMIN /p SADMIN /c \"SSD default instance\" /d SIEBEL /f C:\\Tools_2\\BIN\\Lov" + int + ".dat /l C:\\Tools_2\\BIN\\" + int + " /w y /a IntWSName=" + int + "</mark></code><br>Из папке на деве \\\\10.125.8.59\\d$\\repos_backup забрать последний ночной бекап (большой файл).<br>Полученные 2 файла закинуть в полную сборку, в папку Full Repository(НЕ ДЛЯ ПРОДА)"
+    disRep.innerHTML = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br><b>Дизайн после санити</b><p>После того, как санити будет успешным, необходимо на локальной машине в cmd прогнать скрипт:<br><mark><code> C:\\Tools_2\\BIN\\dataexp /u SADMIN /p SADMIN /c \"SSD default instance\" /d SIEBEL /f C:\\Tools_2\\BIN\\Lov" + int + ".dat /l C:\\Tools_2\\BIN\\" + int + " /w y /a IntWSName=" + int + "</mark></code><br>Из папке на деве \\\\10.125.8.59\\d$\\repos_backup забрать последний ночной бекап (большой файл).<br>Полученные 2 файла закинуть в полную сборку, в папку Full Repository(НЕ ДЛЯ ПРОДА)"
 
     document.getElementById('renderList').appendChild(ol);
     for (let i = 0; i < listOftr.length; i++) { // 
@@ -499,22 +525,28 @@ function createDate(type){
         datePKG.innerHTML = datePKG.innerHTML + arr.dateOutPKG_f
         datePKGFlag = "Y"
       }
+      if(arr.sqlTask){
+        dateTask.innerHTML =  arr.sqlTask
+        dateTaskFlag = "Y"
+      }
       
     }
-    dateOutPr.innerHTML = dateOutPr.innerHTML + "Падая по линку типа данных, проверяем, что все есть по списку объектов. Если все ОК, то нажимаем кнопку Разрешить. <br>Переходим на соседнюю вкладку Сеансы внедрения. Cоздаем сеанс. Выбираем созданный проект. Нажимаем Внедрить. Данные необходимо сохранять по пути  'D:\\ses\\siebsrvr\\TEMP'. Полученные файлы (без _des), сохраняем в патч, в папку ADM. Файл, где только айди, переименовываем по типу X-XX (например 1-04 для патча xx.x.4)"
+    dateOutPr.innerHTML = dateOutPr.innerHTML + "Падая по линку типа данных, проверяем, что все есть по списку объектов. Если все ОК, то нажимаем кнопку Разрешить. <br>Переходим на соседнюю вкладку Сеансы внедрения. Cоздаем сеанс. Выбираем созданный проект. Нажимаем Внедрить. Данные необходимо сохранять по пути  'D:\\ses\\siebsrvr\\TEMP'. Полученные файлы (без _des), сохраняем в патч, в папку ADM. Файл, где только айди, переименовываем по типу X-XX (например 1-04 для патча xx.x.4)>"
   
     //Последоватеьлность
     ol.prepend()
     ol.prepend(disRep)
-    ol.prepend(exportRep)
+    ol.prepend(dateSQLMain)
     if(datePKGFlag == "Y"){ol.prepend(datePKG)}
-    if(sqlScrFlag == "Y"){ol.prepend(dateSQLScr)}
+    if(sqlScrFlag == "Y") {ol.prepend(dateSQLScr)}
     if(dateJMSFlag == "Y"){ol.prepend(dateJMS)}
     if(fileFlag == "Y"){ol.prepend(dateOutFile)}
     if(confFlag == "Y"){ol.prepend(dateOutConf)}
     if(DVFlag == "Y"){ol.prepend(dateOutDV)}
     if(prFlag == "Y"){ol.prepend(dateOutPr)}
+    if(dateTaskFlag == "Y"){ol.prepend(dateTask)}
     if(sqlFlag == "Y"){ol.prepend(sql)}
+    ol.prepend(exportRep)
     if(!fullRRFlg){ol.prepend(exportShem)}
     ol.prepend(createFolder)
     
