@@ -82,11 +82,11 @@ function createWaterMark(){
   document.getElementById("markEx").value = markS;
 }
 
-function createTaskList(task){ //создаем sql апдейт тасков
+function createTaskList(task, ver_patch){ //создаем sql апдейт тасков
   let regVerTask = /\d{1,}/g
   let regNameTask = /\w{1,}\s{0,}\w{0,}\s{0,}\w{0,}\s{0,}\w{0,}\s{0,}\w{0,}\s{0,}\w{0,}\(/g
   let regexp = /^\s+|\s{1,}\(/g
-  let result = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Создать sql файл со следующим текстом: <br><mark><code>update SIEBEL.s_tu_task set status_cd='NOT_IN_USE' where status_cd='COMPLETED';<br>  commit;</mark></code><br>  -----------------------------------------------";
+  let result = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Создать sql файл " + ver_patch + "\\db\\TASKS со следующим текстом: <br><mark><code>update SIEBEL.s_tu_task set status_cd='NOT_IN_USE' where status_cd='COMPLETED';<br>  commit;</mark></code><br>  -----------------------------------------------";
   let ver = "";
   let name = "";
   for (let i = 0; i < task.length; i++) {
@@ -435,11 +435,11 @@ function createDate(type){
           objOut.dateOutFile_f = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Необходимо все файлы добавить в патч в папку \\server , сохраняя при этом путь (пример server\\ses\\applicationcontainer_external\\siebelwebroot\\scripts\\siebel)'
           break;
         case 'PKG':
-          objOut.dateOutPKG_f = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Необходимо добавить файл PKG в папку \\db'
+          objOut.dateOutPKG_f = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Необходимо добавить файл PKG в папку \\db , а так же проверить, что между объявлением ВЬЮ и БОДИ пакета есть символ \\'
           break;
         case 'Task':
           tasks = list;
-          objOut.sqlTask =  createTaskList(list);
+          objOut.sqlTask =  createTaskList(list, ver);
           break;
         case 'JMS Profile':
           objOut.dateJMS  = '<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Добавить JMS-скрипты в папку \\srvmgr'
