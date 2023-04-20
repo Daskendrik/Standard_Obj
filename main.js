@@ -175,7 +175,7 @@ function createDate(type){
     
     //Экспорт других sql скриптов
     let dateSQLMain = document.createElement('li');
-    dateSQLMain.innerHTML = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Сборка постоянных скриптов: <br>Release - указываем тут какой патч/релиз устанавливается<br>MANIFESTS - отключаем ненужные манифесты(очень аккуратно, иногда это необходимо делать поименно)"
+    dateSQLMain.innerHTML = "<b>ГОТОВО</b> <input style: width: 40px; type=\"checkbox\"><br>Сборка постоянных скриптов: <br>Release - указываем тут какой патч/релиз устанавливается<br>MANIFESTS - отключаем ненужные манифесты(очень аккуратно, иногда это необходимо делать поименно) ОЧЕНЬ ВАЖНО - ДЕЛАТЬ ВНИМАТЕЛЬНО!"
     //Экспорт PKG
     let datePKG = document.createElement('li');
     let datePKGFlag = "N";
@@ -567,6 +567,7 @@ function createDate(type){
       stepTaskActive:"В приложении FINS перейти в \"Администрирование - бизнес-процесс -> Внедрение задачи\" найти Task и активировать:",
       stepSIEBEL:"Выполнить скрипт в схеме SIEBEL из папки поставки /db/SIEBEL.sql",
       stepDV:"Произвести импорт правил Data Validation из папки поставки /DV/. После чего активизировать импортированные Data Validation",
+      stepEFS:"Проверить настроки файловой системы для таблицы",
       stepADMRun:"Выполнить импорт АДМ через srvmgr. Выполнить команды:<p><p style=\"margin-left: 50px;\">run task for comp WfProcMgr server app with ProcessName=\"ATC Import ADM\", RowId=\"1-02\"<p><p style=\"margin-left: 50px;\">После выполнения комманды - верифицировать успешный импорт через таблицу SIEBEL.CX_LOG!",
       stepADMFile:"Скопировать содержимое папки поставки /ADM/ в папку на сервере C:/ADM/", 
       stepTask:"Выполнить скрипт в схеме SIEBEL /db/TASKS.sql",
@@ -575,6 +576,7 @@ function createDate(type){
       repFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p <Пароль SADMIN> /l <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".log /f <Путь до поставки>\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c <Актуальный ODBC стенда><p>",
       stepSchemeBNK:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
       DDLFileBNK:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p <Пароль SIEBEL> /c <Актуальный ODBC стенда> /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".log /q <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql<p>",
+      repFileFILFR: "Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p SADMIN /l C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".log /f C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /Z 1000 /r \"Migrated Repository\" /c SBLTST_DSN<p>",
       repFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\repimexp.exe /u SADMIN /p SADMIN /l C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".log /f C:\\atc\\Releases\\" + ver + "\\repository\\" + repFileName + ".dat /A P /d SIEBEL /r \"Siebel Repository\" /c SBLTST_DSN<p>",
       stepSchemeFIL:"По окончанию выполнить сгенерированный файл <Путь до поставки>\\" + ver + "\\scheme\\" + DDLFileName + ".sql",
       DDLFileFIL:"Выполнить команду в cmd консоли с правами администратора: <p><p style=\"margin-left: 50px;\">C:\\ses\\siebsrvr\\BIN\\ddlimp.exe /u SIEBEL /p SIEBEL /c SBLTST_DSN /g SSE_ROLE /b SIEBEL_DATA /x SIEBEL_INDX /R N /9 Y /S Y /W Y /N Y /6 1000 /f C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".ctl /l C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".log /q C:\\atc\\Releases\\" + ver + "\\scheme\\" + DDLFileName + ".sql<p>",
@@ -617,6 +619,9 @@ function createDate(type){
       }
       if(cashEvent == 'N' && (sNameOb == 'RTE' || sNameOb == 'Personalization – Actions')){
         cashEvent = 'Y';
+      }
+      if(sNameOb == 'RTE' || sNameOb == 'EFS Profile'){
+
       }
     }
 
@@ -695,15 +700,25 @@ function createDate(type){
     for (const key in maunu_obj) {
       let a = document.createElement('li')
       if(key!= 'stepSchemeBNK' && key!='repFileBNK' && key!='DDLFileBNK' && maunu_obj[key] != ""){
-        a.innerHTML = num_b + ") " + maunu_obj[key]
-        manu_fil.prepend(a)
-        num_b--;
-      };
+        if(fullRRFlg == true){
+          if(key != 'repFileFIL') {
+            a.innerHTML = num_b + ") " + maunu_obj[key]
+            manu_fil.prepend(a)
+            num_b--;
+          }
+        } else {
+            if(key != 'repFileFILFR') {
+              a.innerHTML = num_b + ") " + maunu_obj[key]
+              manu_fil.prepend(a)
+              num_b--;
+            }
+        }
+      }
     }
     let num_a = num;
     for (const key in maunu_obj) {
       let a = document.createElement('li')
-      if(key!= 'stepSchemeFIL' && key!='DDLFileFIL' && key!='repFileFIL' && maunu_obj[key] != ""){
+      if(key!= 'stepSchemeFIL' && key!='DDLFileFIL' && key!='repFileFIL' && key!='repFileFILFR' && maunu_obj[key] != ""){
         a.innerHTML = num_a + ") " + maunu_obj[key]
         manu_bank.prepend(a)
         num_a--;
